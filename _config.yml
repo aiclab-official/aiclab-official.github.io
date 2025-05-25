@@ -14,7 +14,8 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 title: AICLAB
-email:
+url: "https://aiclab-official.github.io/"
+baseurl: ""
 description: >- # this means to ignore newlines until "baseurl:"
   Inspiring the Next Generation of FPGA, ASIC, and Digital Circuit Design Engineers. From 0 and 1 to ∞.
 
@@ -32,6 +33,11 @@ permalink: /:categories/:title/
 paginate: 5 # amount of posts to show
 paginate_path: /page:num/
 timezone: # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+
+mathjax:
+  enable: true  # Enable MathJax globally
+  combo: "tex-svg"  # Use TeX as input and SVG as output (recommended)
+  tags: "ams"  # Use AMS-LaTeX tags
 
 include:
   - _pages
