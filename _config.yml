@@ -66,7 +66,7 @@ plugins:
 author:
   name   : "AICLAB"
   avatar : "/assets/images/AICLAB.png"
-  bio    : "Hardware engineer specializing in digital design."
+  bio    : "Digital Circuit Design, FPGA, and ASIC Design Education"
   links:
     - label: "Website"
       icon: "fas fa-fw fa-link"
@@ -119,6 +119,18 @@ defaults:
     values:
       layout: single
       author_profile: true
+  # _systemverilog
+  - scope:
+      path: ""
+      type: systemverilog
+    values:
+      layout: single
+      author_profile: true
+      share: true
+      comments: true
+      toc: true
+      toc_sticky: true
+      related: true
 
 category_archive:
   type: liquid
@@ -126,3 +138,12 @@ category_archive:
 tag_archive:
   type: liquid
   path: /tags/
+
+# Collections for different content types
+collections:
+  systemverilog:
+    output: true
+    permalink: /:collection/:path/
+  sta:
+    output: true
+    permalink: /:collection/:path/

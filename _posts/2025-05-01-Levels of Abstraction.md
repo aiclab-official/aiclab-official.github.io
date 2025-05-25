@@ -1,5 +1,6 @@
 ---
-title: "1. Levels of Abstraction in Digital Circuit Design"
+number: 1
+title: "SV1. Levels of Abstraction in Digital Circuit Design"
 date: 2025-05-01
 categories:
   - SystemVerilog
