@@ -48,7 +48,7 @@ pagination:
     before: 2
     after: 2
   extension: html
-  indexpage: 'posts'
+  indexpage: 'index'
 
 # Disable autopages to avoid layout errors
 autopages:

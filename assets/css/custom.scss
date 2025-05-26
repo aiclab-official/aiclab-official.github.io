@@ -7,6 +7,84 @@
 
 /* Custom styles for AICLAB */
 
+/* Beautiful gradient header styling */
+.page__hero,
+.page__hero--overlay {
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #8e2de2 75%, #c2185b 100%) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.page__hero::before,
+.page__hero--overlay::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.2) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.page__hero-caption,
+.page__hero .page__lead {
+  color: rgba(255, 255, 255, 0.9) !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  font-size: 1.1em;
+  font-weight: 300;
+  position: relative;
+  z-index: 2;
+}
+
+.page__title {
+  position: relative;
+  z-index: 2;
+}
+
+/* Beautiful gradient header styling */
+.page__hero,
+.page__hero--overlay {
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #8e2de2 75%, #c2185b 100%) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.page__hero::before,
+.page__hero--overlay::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.2) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.page__hero-caption,
+.page__hero .page__lead {
+  color: rgba(255, 255, 255, 0.9) !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  font-size: 1.1em;
+  font-weight: 300;
+  position: relative;
+  z-index: 2;
+}
+
+.page__title {
+  position: relative;
+  z-index: 2;
+}
+
 /* Scale down feature row images */
 .feature__item .archive__item-teaser img {
   max-height: 200px;
