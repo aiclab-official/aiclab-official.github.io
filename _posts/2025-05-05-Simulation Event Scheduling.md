@@ -1,7 +1,6 @@
 ---
 number: 5
 title: "SV5. Simulation Event Scheduling in Verilog/SystemVerilog"
-layout: collection
 date: 2025-05-05
 categories:
   - SystemVerilog
@@ -9,6 +8,9 @@ tags:
   - event scheduling
   - delta cycles
   - non-blocking assignments
+excerpt: "Deep dive into simulation event scheduling, delta cycles, and non-blocking assignments. Understand how Verilog simulators handle timing and event ordering in digital designs."
+header:
+  teaser: /assets/images/5- Simulation Event Scheduling.png
 ---
 
 

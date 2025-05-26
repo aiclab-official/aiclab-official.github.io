@@ -1,7 +1,209 @@
 ---
-# You don't need to edit this file, it's empty on purpose.
-# Edit theme's home layout instead if you wanna make some changes
-# See: https://jekyllrb.com/docs/themes/#overriding-theme-defaults
-layout: home
-author_profile: true
+layout: splash
+permalink: /
+hidden: true
+header:
+  overlay_color: "#5e616c"
+  overlay_image: /assets/images/AICLAB.png
+  overlay_filter: 0.5
+  actions:
+    - label: "<i class='fas fa-download'></i> Explore Our Content"
+      url: "/posts/"
+excerpt: >
+  Inspiring the Next Generation of FPGA, ASIC, and Digital Circuit Design Engineers.<br />
+  <small>From 0 and 1 to ∞</small>
+feature_row2:
+  - image_path: /assets/images/1- LevelOfAbstraction.png
+    alt: "Design Abstraction"
+    title: "Levels of Abstraction in Digital Design"
+    excerpt: 'Understanding different levels of abstraction is crucial for effective digital circuit design. From behavioral to gate-level descriptions.'
+    url: "/systemverilog/Levels-of-Abstraction/"
+    btn_class: "btn--primary"
+    btn_label: "Read More"
+feature_row3:
+  - image_path: /assets/images/2- Design flow.png
+    alt: "Design Flow"
+    title: "FPGA vs ASIC Design Process"
+    excerpt: 'Learn the key differences between FPGA and ASIC design flows and choose the right approach for your project.'
+    url: "/systemverilog/FPGA-vs-ASIC-Design-Process/"
+    btn_class: "btn--primary"
+    btn_label: "Read More"
 ---
+
+<style>
+/* Custom styles for post rows */
+.post-row {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 2em;
+  padding: 1.5em;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.post-row:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.post-image {
+  flex: 0 0 200px;
+  margin-right: 1.5em;
+  overflow: hidden;
+  border-radius: 6px;
+}
+
+.post-image img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.post-content {
+  flex: 1;
+}
+
+.post-title {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+.post-title a {
+  color: #333;
+  text-decoration: none;
+}
+
+.post-title a:hover {
+  color: #007acc;
+  text-decoration: underline;
+}
+
+.post-excerpt {
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 1em;
+}
+
+.post-meta {
+  font-size: 0.9em;
+  color: #999;
+  margin-bottom: 0.5em;
+}
+
+.post-tags {
+  margin-top: 0.5em;
+}
+
+.post-tags .tag {
+  display: inline-block;
+  background: #f0f0f0;
+  color: #666;
+  padding: 0.2em 0.5em;
+  border-radius: 3px;
+  font-size: 0.8em;
+  margin-right: 0.5em;
+  text-decoration: none;
+}
+
+.post-tags .tag:hover {
+  background: #007acc;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .post-row {
+    flex-direction: column;
+    padding: 1em;
+  }
+  
+  .post-image {
+    flex: none;
+    margin-right: 0;
+    margin-bottom: 1em;
+    max-width: 100%;
+  }
+  
+  .post-image img {
+    height: 120px;
+  }
+}
+
+/* Header styles - keep existing ones */
+.feature__item .archive__item-teaser img {
+  max-height: 200px !important;
+  width: auto !important;
+  object-fit: cover !important;
+  border-radius: 8px !important;
+}
+
+.page__hero--overlay .page__hero-image {
+  object-fit: contain !important;
+  max-height: 300px !important;
+}
+</style>
+
+## Recent Posts
+
+<div class="posts-container">
+  {% for post in site.posts limit: 5 %}
+    <article class="post-row">
+      {% if post.header.teaser %}
+        <div class="post-image">
+          <img src="{{ post.header.teaser | relative_url }}" alt="{{ post.title }}">
+        </div>
+      {% endif %}
+      
+      <div class="post-content">
+        <div class="post-meta">
+          <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%B %d, %Y" }}</time>
+          {% if post.categories %}
+            • {{ post.categories | join: ", " }}
+          {% endif %}
+        </div>
+        
+        <h3 class="post-title">
+          <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+        </h3>
+        
+        <div class="post-excerpt">
+          {% assign post_excerpt = post.excerpt | strip_html | strip %}
+          {% if post_excerpt != "" %}
+            {{ post_excerpt | truncatewords: 40 }}
+          {% else %}
+            {% assign post_content = post.content | strip_html | strip %}
+            {% assign content_words = post_content | split: ' ' %}
+            {% assign filtered_content = '' %}
+            {% for word in content_words %}
+              {% unless word contains 'png' or word contains 'jpg' or word contains 'jpeg' or word contains 'gif' or word contains '![' %}
+                {% assign filtered_content = filtered_content | append: ' ' | append: word %}
+              {% endunless %}
+            {% endfor %}
+            {{ filtered_content | truncatewords: 40 }}
+          {% endif %}
+        </div>
+        
+        {% if post.tags %}
+          <div class="post-tags">
+            {% for tag in post.tags limit: 3 %}
+              <a href="{{ '/tags/#' | append: tag | slugify | relative_url }}" class="tag">{{ tag }}</a>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    </article>
+  {% endfor %}
+</div>
+
+{% if site.posts.size > 5 %}
+<div class="feature__wrapper">
+  <p style="text-align: center; margin-top: 2em;">
+    <a href="/posts/" class="btn btn--primary btn--large">View All Posts</a>
+  </p>
+</div>
+{% endif %}

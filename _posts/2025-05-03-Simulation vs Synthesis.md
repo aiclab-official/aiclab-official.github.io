@@ -8,6 +8,9 @@ tags:
   - simulation
   - synthesis
   - elaboration
+excerpt: "Explore the fundamental differences between simulation and synthesis in digital design. Understand how your SystemVerilog code behaves in simulation versus hardware implementation."
+header:
+  teaser: /assets/images/3- Simulation_Synthesis.png
 ---
 
 

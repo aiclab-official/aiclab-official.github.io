@@ -30,9 +30,29 @@ markdown: kramdown
 remote_theme: mmistakes/minimal-mistakes
 # Outputting
 permalink: /:categories/:title/
-paginate: 5 # amount of posts to show
-paginate_path: /page:num/
 timezone: # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+
+############################################################
+# Site configuration for Jekyll Paginate V2
+############################################################
+pagination:
+  enabled: true
+  per_page: 6
+  permalink: '/page/:num/'
+  title: ' - Page :num'
+  limit: 0
+  sort_field: 'date'
+  sort_reverse: true
+  collection: 'posts'
+  trail:
+    before: 2
+    after: 2
+  extension: html
+  indexpage: 'posts'
+
+# Disable autopages to avoid layout errors
+autopages:
+  enabled: false
 
 mathjax:
   enable: true  # Enable MathJax globally
@@ -56,7 +76,7 @@ include:
 
 # Plugins (previously gems:)
 plugins:
-  - jekyll-paginate
+  - jekyll-paginate-v2
   - jekyll-sitemap
   - jekyll-gist
   - jekyll-feed
@@ -86,7 +106,7 @@ author:
 
 footer:
   links:
-    - lable: "LinkedIn"
+    - label: "LinkedIn"
       icon: "fab fa-fw fa-linkedin"
       url: "https://www.linkedin.com/company/aiclab-official/"
     - label: "Twitter"

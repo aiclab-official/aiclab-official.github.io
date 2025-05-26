@@ -1,0 +1,53 @@
+---
+# Only the main Sass file needs front matter (the dashes are enough)
+---
+
+@import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
+@import "minimal-mistakes"; // main partials
+
+/* Custom styles for AICLAB */
+
+/* Scale down feature row images */
+.feature__item .archive__item-teaser img {
+  max-height: 200px;
+  width: auto;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Scale down grid post images */
+.grid__item .archive__item-teaser img {
+  max-height: 150px;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+/* Ensure feature row images don't get too wide */
+.feature__item .archive__item-teaser {
+  max-height: 200px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+/* Add some spacing and improve layout */
+.feature__item {
+  margin-bottom: 2em;
+}
+
+/* Header overlay image scaling */
+.page__hero--overlay .page__hero-image {
+  object-fit: contain;
+  max-height: 300px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .feature__item .archive__item-teaser img {
+    max-height: 150px;
+  }
+  
+  .grid__item .archive__item-teaser img {
+    max-height: 120px;
+  }
+}

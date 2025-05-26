@@ -6,6 +6,9 @@ categories:
   - SystemVerilog
 tags:
   - Design Process
+excerpt: "Learn the key differences between FPGA and ASIC design flows. Understand when to choose each approach and the trade-offs involved in hardware design decisions."
+header:
+  teaser: /assets/images/2- Design flow.png
 ---
 
 

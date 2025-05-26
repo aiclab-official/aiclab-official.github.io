@@ -5,7 +5,10 @@ date: 2025-05-01
 categories:
   - SystemVerilog
 tags:
-  - Levels of Abstraction 
+  - Levels of Abstraction
+excerpt: "Understanding different levels of abstraction is crucial for effective digital circuit design. Learn about algorithmic, RTL, gate, and switch levels in SystemVerilog design methodology."
+header:
+  teaser: /assets/images/1- LevelOfAbstraction.png
 ---
 
 
