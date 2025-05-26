@@ -9,10 +9,11 @@ tags:
 excerpt: "Understanding different levels of abstraction is crucial for effective digital circuit design. Learn about algorithmic, RTL, gate, and switch levels in SystemVerilog design methodology."
 header:
   teaser: /assets/images/1- LevelOfAbstraction.png
+classes: wide
 ---
 
 
-![Algorithmic Level Example](/assets/images/1- LevelOfAbstraction.png)
+<img src="/assets/images/1- LevelOfAbstraction.png" alt="Algorithmic Level Example" style="width: 50%; display: block; margin: 0 auto;">
 
 Here's a quick overview of different levels of abstraction in digital circuit design using SystemVerilog:
 

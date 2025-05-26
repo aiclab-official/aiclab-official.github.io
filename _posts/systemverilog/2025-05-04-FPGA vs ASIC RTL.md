@@ -10,6 +10,7 @@ tags:
 excerpt: "Master the key differences in RTL coding styles for ASIC and FPGA targets. Learn about timing considerations, resource constraints, and optimization strategies for each platform."
 header:
   teaser: /assets/images/4- ASIC_FPGA_RTL_coding.png
+classes: wide
 ---
 
 
