@@ -17,6 +17,19 @@ header:
 
 This article provides a comparative analysis of the design processes for both FPGA and ASIC.
 
+## Video Tutorial
+
+Watch this comprehensive video explanation of differences between FPGA and ASIC design flows:
+
+<div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; margin: 20px 0;">
+  <iframe 
+    src="https://www.youtube.com/embed/mMqwQk3Keyw" 
+    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
+    frameborder="0" 
+    allowfullscreen>
+  </iframe>
+</div>
+
 ## Design Specification
 Define the detailed system requirements and specifications with high-level block diagrams in a document, used as a reference for design engineers.
 

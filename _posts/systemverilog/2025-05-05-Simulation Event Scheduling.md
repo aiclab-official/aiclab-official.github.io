@@ -17,6 +17,19 @@ header:
 
 ![Simulation Event Scheduling](/assets/images/5- Simulation Event Scheduling.png)
 
+## Video Tutorial
+
+Watch this comprehensive video explanation of simulation event scheduling:
+
+<div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; margin: 20px 0;">
+  <iframe 
+    src="https://www.youtube.com/embed/dLiQp9lyVKg" 
+    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
+    frameborder="0" 
+    allowfullscreen>
+  </iframe>
+</div>
+
 In Verilog or SystemVerilog, the simulation process is divided into Time Slots, and each Time Slot is divided into event regions. This structure is called the simulation event scheduler. 
 
 Each event region includes Active, Inactive, and Non-Blocking Assignments (NBA) regions for design-related events and a Monitor region for system tasks.

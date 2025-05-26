@@ -15,8 +15,20 @@ header:
 
 
 
-![Comparing FPGA and ASIC Design Processes](/assets/images/4- ASIC_FPGA_RTL_coding.png)
+![Comparing FPGA and ASIC Coding](/assets/images/4- ASIC_FPGA_RTL_coding.png)
 
+## Video Tutorial
+
+Watch this comprehensive video explanation of differences between FPGA and ASIC RTL coding:
+
+<div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; margin: 20px 0;">
+  <iframe 
+    src="https://www.youtube.com/embed/jLPpWoefSfc" 
+    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
+    frameborder="0" 
+    allowfullscreen>
+  </iframe>
+</div>
 
 ## Reset
 - **ASIC**: Standard cell library contains both asynchronous and synchronous reset flip-flops.
