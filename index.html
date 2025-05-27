@@ -2,6 +2,9 @@
 layout: splash
 permalink: /
 hidden: true
+pagination: 
+  enabled: true
+  per_page: 10
 header:
   overlay_color: "#000"
   overlay_filter: 0.3
@@ -149,7 +152,7 @@ feature_row3:
 
 
 <div class="posts-container">
-  {% for post in site.posts limit: 5 %}
+  {% for post in paginator.posts %}
     <article class="post-row">
       {% if post.header.teaser %}
         <div class="post-image">
@@ -198,10 +201,36 @@ feature_row3:
   {% endfor %}
 </div>
 
-{% if site.posts.size > 5 %}
-<div class="feature__wrapper">
-  <p style="text-align: center; margin-top: 2em;">
-    <a href="/posts/" class="btn btn--primary btn--large">View All Posts</a>
-  </p>
-</div>
+<!-- Traditional Pagination -->
+{% if paginator.total_pages > 1 %}
+<nav class="pagination">
+  {% if paginator.previous_page %}
+    <a href="{{ paginator.previous_page_path | relative_url }}" class="btn btn--primary">← Previous</a>
+  {% endif %}
+  
+  <span class="page-info">Page {{ paginator.page }} of {{ paginator.total_pages }}</span>
+  
+  {% if paginator.next_page %}
+    <a href="{{ paginator.next_page_path | relative_url }}" class="btn btn--primary">Next →</a>
+  {% endif %}
+</nav>
+
+<style>
+.pagination {
+  text-align: center;
+  margin-top: 2em;
+  padding: 1em 0;
+}
+
+.pagination .btn {
+  margin: 0 0.5em;
+}
+
+.page-info {
+  display: inline-block;
+  margin: 0 1em;
+  color: #666;
+  font-weight: bold;
+}
+</style>
 {% endif %}
