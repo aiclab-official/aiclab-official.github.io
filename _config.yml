@@ -25,6 +25,13 @@ github_username: aiclab-official
 minimal_mistakes_skin: default
 search: true
 
+# Analytics
+analytics:
+  provider: "google-gtag"
+  google:
+    tracking_id: "G-ZZC426HQJY"  # Replace with your Google Analytics 4 Measurement ID
+    anonymize_ip: false
+
 # Build settings
 markdown: kramdown
 remote_theme: mmistakes/minimal-mistakes
