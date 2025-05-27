@@ -57,7 +57,7 @@ header:
   background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
 }
 
-.category-header.verification {
+.category-header.book-review {
   background: linear-gradient(135deg, #2196F3 0%, #1565C0 100%);
 }
 
@@ -173,7 +173,7 @@ header:
           <img src="/assets/images/1- LevelOfAbstraction.png" alt="{{ category_name }}" class="category-image">
         {% elsif category_name == "STA" %}
           <img src="/assets/images/2- Design flow.png" alt="{{ category_name }}" class="category-image">
-        {% elsif category_name == "Verification" %}
+        {% elsif category_name == "Book Review" %}
           <img src="/assets/images/3- Simulation_Synthesis.png" alt="{{ category_name }}" class="category-image">
         {% endif %}
         
@@ -183,8 +183,8 @@ header:
               <i class="fas fa-microchip"></i>
             {% elsif category_name == "STA" %}
               <i class="fas fa-clock"></i>
-            {% elsif category_name == "Verification" %}
-              <i class="fas fa-check-circle"></i>
+            {% elsif category_name == "Book Review" %}
+              <i class="fas fa-book"></i>
             {% elsif category_name == "UVM" %}
               <i class="fas fa-cogs"></i>
             {% else %}
@@ -202,8 +202,8 @@ header:
             Digital circuit design, FPGA and ASIC development, RTL coding, and SystemVerilog language fundamentals.
           {% elsif category_name == "STA" %}
             Static Timing Analysis, timing constraints, clock domain crossing, and timing closure techniques.
-          {% elsif category_name == "Verification" %}
-            Testbench development, verification methodologies, and validation strategies for digital designs.
+          {% elsif category_name == "Book Review" %}
+            Book recommendations, reviews, and insights from technical literature and educational resources.
           {% elsif category_name == "UVM" %}
             Universal Verification Methodology, advanced testbench architectures, and verification components.
           {% else %}
@@ -256,28 +256,28 @@ header:
     </div>
   {% endunless %}
   
-  {% unless site.categories contains "Verification" %}
+  {% unless site.categories contains "Book Review" %}
     <div class="category-card" style="opacity: 0.7;">
-      <div class="category-header verification">
+      <div class="category-header book-review">
         <div class="category-overlay">
           <div class="category-icon">
-            <i class="fas fa-check-circle"></i>
+            <i class="fas fa-book"></i>
           </div>
-          <h3 class="category-title">Verification</h3>
+          <h3 class="category-title">Book Review</h3>
           <div class="category-count">Coming Soon</div>
         </div>
       </div>
       
       <div class="category-body">
         <div class="category-description">
-          Testbench development, verification methodologies, and validation strategies for digital designs.
+          Book recommendations, reviews, and insights from technical literature and educational resources.
         </div>
         
         <div class="category-topics">
-          <span class="topic-tag">Testbenches</span>
-          <span class="topic-tag">Assertions</span>
-          <span class="topic-tag">Coverage</span>
-          <span class="topic-tag">Debugging</span>
+          <span class="topic-tag">Book Reviews</span>
+          <span class="topic-tag">Recommendations</span>
+          <span class="topic-tag">Technical Books</span>
+          <span class="topic-tag">Learning Resources</span>
         </div>
       </div>
     </div>
@@ -292,7 +292,7 @@ header:
   
   <section id="{{ category_slug }}" style="margin-top: 4em; padding-top: 2em; border-top: 2px solid #f0f0f0;">
     <h2 style="color: #333; margin-bottom: 1.5em;">
-      <i class="fas fa-{% if category_name == 'SystemVerilog' %}microchip{% elsif category_name == 'STA' %}clock{% elsif category_name == 'Verification' %}check-circle{% else %}folder{% endif %}" style="margin-right: 0.5em; color: #007acc;"></i>
+      <i class="fas fa-{% if category_name == 'SystemVerilog' %}microchip{% elsif category_name == 'STA' %}clock{% elsif category_name == 'Book Review' %}book{% else %}folder{% endif %}" style="margin-right: 0.5em; color: #007acc;"></i>
       {{ category_name }} Posts
     </h2>
     
