@@ -2,6 +2,17 @@
 
 This directory contains all blog posts organized by topic in subdirectories:
 
+
+## Copying HTML-formatted content from a Markdown file to the clipboard 
+
+```bash
+pandoc -f markdown -t html5 File.md | xclip -selection clipboard -t text/html
+```
+
+## Code
+
+Using a tool like [Carbon](https://carbon.now.sh), [Ray.so](https://ray.so), or [Snappify.io] to create a **code snippet image**.
+
 ## Subdirectories
 
 ### `systemverilog/`
