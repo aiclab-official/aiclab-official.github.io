@@ -87,26 +87,24 @@
 
 /* Scale down feature row images */
 .feature__item .archive__item-teaser img {
-  max-height: unset;
-  width: 100%;
-  height: auto;
-  object-fit: contain !important;
+  max-height: 200px;
+  width: auto;
+  object-fit: cover;
   border-radius: 8px;
 }
 
 /* Scale down grid post images */
 .grid__item .archive__item-teaser img {
-  max-height: unset;
+  max-height: 150px;
   width: 100%;
-  height: auto;
-  object-fit: contain !important;
+  object-fit: cover;
   border-radius: 4px;
 }
 
 /* Ensure feature row images don't get too wide */
 .feature__item .archive__item-teaser {
-  max-height: unset;
-  overflow: visible;
+  max-height: 200px;
+  overflow: hidden;
   border-radius: 8px;
 }
 
@@ -124,10 +122,10 @@
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .feature__item .archive__item-teaser img {
-    max-height: unset;
+    max-height: 150px;
   }
   
   .grid__item .archive__item-teaser img {
-    max-height: unset;
+    max-height: 120px;
   }
 }
