@@ -174,3 +174,6 @@ collections:
   sta:
     output: true
     permalink: /:collection/:path/
+  book-review:
+    output: true
+    permalink: /:collection/:path/
