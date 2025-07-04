@@ -112,13 +112,13 @@ header:
 
 .post-category-badge {
   position: absolute;
-  top: 1em;
+  bottom: 1em;
   left: 1em;
   background: rgba(255,255,255,0.95);
   color: #2E7D32;
   padding: 0.3em 0.8em;
   border-radius: 20px;
-  font-size: 0.6em;
+  font-size: 0.4em;
   font-weight: 600;
   text-decoration: none;
   transition: all 0.2s ease;
