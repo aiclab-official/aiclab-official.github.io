@@ -300,9 +300,7 @@ header:
       {% for post in posts %}
         <article style="background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; transition: transform 0.2s ease, box-shadow 0.2s ease;">
           {% if post.header.teaser %}
-            <div class="teaser-img-uniform">
-              <img src="{{ post.header.teaser | relative_url }}" alt="{{ post.title }}">
-            </div>
+            <div style="height: 150px; background-image: url('{{ post.header.teaser | relative_url }}'); background-size: cover; background-position: center;"></div>
           {% endif %}
           
           <div style="padding: 1.2em;">
