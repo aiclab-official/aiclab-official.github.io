@@ -1,17 +1,31 @@
-# Posts Organization
+# Jekyll server
 
-This directory contains all blog posts organized by topic in subdirectories:
+## Install dependencies
 
+```bash
+bundle install
+```
 
-## Copying HTML-formatted content from a Markdown file to the clipboard 
+## Run the Jekyll server
+
+```bash
+bundle exec jekyll serve
+```
+
+# Copying HTML-formatted content from a Markdown file to the clipboard 
 
 ```bash
 pandoc -f markdown -t html5 File.md | xclip -selection clipboard -t text/html
 ```
 
-## Code
+# Code
 
 Using a tool like [Carbon](https://carbon.now.sh), [Ray.so](https://ray.so), or [Snappify.io] to create a **code snippet image**.
+
+
+# Posts Organization
+
+This directory contains all blog posts organized by topic in subdirectories:
 
 ## Subdirectories
 
