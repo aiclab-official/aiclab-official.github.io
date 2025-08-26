@@ -7,6 +7,34 @@
 
 /* Custom styles for AICLAB */
 
+/* Typography: slightly reduce post font sizes (scoped to single post/page layout) */
+.layout--single .page__content {
+  font-size: 0.95rem; /* body text in posts */
+  line-height: 1.7;
+}
+
+.layout--single .page__content h1 { font-size: 1.9rem; }
+.layout--single .page__content h2 { font-size: 1.6rem; }
+.layout--single .page__content h3 { font-size: 1.3rem; }
+.layout--single .page__content h4 { font-size: 1.1rem; }
+.layout--single .page__content h5 { font-size: 1rem; }
+.layout--single .page__content h6 { font-size: 0.95rem; }
+
+/* Code blocks and inline code a bit smaller inside posts */
+.layout--single .page__content pre,
+.layout--single .page__content code,
+.layout--single .page__content kbd,
+.layout--single .page__content samp {
+  font-size: 0.9em;
+}
+
+/* Tweak mobile to keep readability */
+@media (max-width: 768px) {
+  .layout--single .page__content { font-size: 0.98rem; }
+  .layout--single .page__content h1 { font-size: 1.8rem; }
+  .layout--single .page__content h2 { font-size: 1.45rem; }
+}
+
 /* Scale down feature row images */
 .feature__item .archive__item-teaser img {
   max-height: 200px;
