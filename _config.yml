@@ -14,7 +14,7 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 title: AICLAB
-url: "https://aiclab-official.github.io/"
+url: "https://aic-lab.com/"
 baseurl: ""
 description: >- # this means to ignore newlines until "baseurl:"
   Inspiring the Next Generation of FPGA, ASIC, and Digital Circuit Design Engineers. From 0 and 1 to ∞.
@@ -97,7 +97,7 @@ author:
   links:
     - label: "Website"
       icon: "fas fa-fw fa-link"
-      url: "https://aiclab-official.github.io/"
+      url: "https://aic-lab.com/"
     - label: "Twitter"
       icon: "fab fa-fw fa-twitter-square"
       url: "https://x.com/aiclab_official"
