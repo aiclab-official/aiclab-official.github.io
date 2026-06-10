@@ -1,5 +1,21 @@
 <!-- start custom head snippets -->
 
+{% if site.mathjax.enable and page.collection %}
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      tags: '{{ site.mathjax.tags | default: "none" }}'
+    },
+    svg: {
+      fontCache: 'global'
+    }
+  };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+{% endif %}
+
 <style>
 /* Beautiful gradient header styling for AICLAB */
 .page__hero,
