@@ -27,10 +27,7 @@ search: true
 
 # Analytics
 analytics:
-  provider: "google-gtag"
-  google:
-    tracking_id: "G-ZZC426HQJY"  # Replace with your Google Analytics 4 Measurement ID
-    anonymize_ip: false
+  provider: false
 
 # Build settings
 markdown: kramdown
