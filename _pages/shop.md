@@ -14,5 +14,6 @@ Welcome to the AICLAB shop page.
 ## PDF
 
 - [The PDF presentation file for the Udemy course "The Complete SystemVerilog for Digital Design and Synthesis."](https://aiclab.gumroad.com/l/SystemVerilog)
-
+    - The best resource to learn and review synthesizable SystemVerilog.
+    - Complete SystemVerilog syntax and examples for digital design and synthesis.
 
