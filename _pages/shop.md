@@ -1,9 +1,9 @@
 ---
-permalink: /shop/
-title: "Shop"
+permalink: /resources/
+title: "Resources"
 ---
 
-Welcome to the AICLAB shop page.
+Welcome to the AICLAB Resources page.
 
 ## Udemy Course
 
