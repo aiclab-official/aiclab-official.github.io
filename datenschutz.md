@@ -52,8 +52,6 @@ Sinne des TDDDG umfasst. Die Einwilligung ist jederzeit widerrufbar.
 Unser(e) Hoster wird bzw. werden Ihre Daten nur insoweit verarbeiten, wie dies zur Erfüllung seiner
 Leistungspflichten erforderlich ist und unsere Weisungen in Bezug auf diese Daten befolgen.
 
-Unser(e) Hoster wird bzw. werden Ihre Daten nur insoweit verarbeiten, wie dies zur Erfüllung seiner Leistungspflichten erforderlich ist und unsere Weisungen in Bezug auf diese Daten befolgen.
-
 Wir setzen folgende(n) Hoster ein:
 
 **Name:** GitHub, Inc.  
