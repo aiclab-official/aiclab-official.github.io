@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deriving input_ready</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #131922;
+    --text: #e6edf3;
+    --dim: #7d8896;
+    --dimmer: #55606e;
+    --ok: #2ecc8f;
+    --stall: #ff4d5a;
+    --warn: #ffb454;
+    --chip: #33a3ff;
+    --wire: #48566b;
+    --line: #1e2735;
+  }
+  html, body { margin: 0; background: var(--bg); color: var(--text);
+    font-family: "Inter", "Segoe UI", system-ui, sans-serif; }
+  #frame { width: 100%; max-width: 1280px; background: var(--bg); position: relative; }
+  #stage { width: 100%; height: auto; display: block; }
+  #controls { width: 100%; max-width: 1280px; box-sizing: border-box; padding: 14px 24px 16px;
+    display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+    font-size: 14px; color: var(--dim); }
+  button { background: #1d2733; color: var(--text); border: 1px solid #2d3a4b;
+    border-radius: 6px; padding: 8px 16px; font: inherit; font-size: 14px; cursor: pointer; }
+  button:hover { background: #26333f; }
+  button.on { background: #1f4d6b; border-color: #2f7fb5; color: #fff; }
+  button.bad { background: #5c1f27; border-color: #a33b46; color: #ffd7da; }
+  input[type=range] { width: 160px; vertical-align: middle; }
+  .hint { margin-left: auto; font-size: 12px; }
+  text { font-family: "Inter", "Segoe UI", system-ui, sans-serif; }
+  .mono { font-family: "JetBrains Mono", "Consolas", ui-monospace, monospace; }
+  .chip { transition: transform .34s cubic-bezier(.4,.1,.3,1), opacity .34s linear; }
+  .no-anim { transition: none !important; }
+  .soft { transition: fill .2s linear, stroke .2s linear, opacity .2s linear; }
+</style>
+</head>
+<body>
+<div id="frame">
+<svg id="stage" viewBox="0 0 1280 720">
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0,0 L9,4.5 L0,9 z" fill="#48566b"/>
+    </marker>
+    <marker id="arrowOk" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0,0 L9,4.5 L0,9 z" fill="#2ecc8f"/>
+    </marker>
+    <marker id="arrowStall" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0,0 L9,4.5 L0,9 z" fill="#ff4d5a"/>
+    </marker>
+  </defs>
+
+  <!-- ================= band A : title + readouts ================= -->
+  <text id="title" x="48" y="58" font-size="27" font-weight="700" fill="#e6edf3">Deriving input_ready - when can this stage accept?</text>
+  <text id="subtitle" x="48" y="88" font-size="16" fill="#7d8896" class="mono">input_ready = !output_valid || output_ready</text>
+
+  <text x="940" y="46" font-size="13" fill="#7d8896" text-anchor="end">ACCEPTED</text>
+  <text id="acceptedNum" x="940" y="80" font-size="30" font-weight="700" fill="#e6edf3" text-anchor="end">0</text>
+  <text x="1086" y="46" font-size="13" fill="#7d8896" text-anchor="end">BUBBLES</text>
+  <text id="bubbleNum" x="1086" y="80" font-size="30" font-weight="700" fill="#2ecc8f" text-anchor="end">0</text>
+  <text x="1232" y="46" font-size="13" fill="#7d8896" text-anchor="end">CYCLE</text>
+  <text id="cycleNum" x="1232" y="80" font-size="30" font-weight="700" fill="#e6edf3" text-anchor="end">0</text>
+
+  <!-- ================= band B : the stage ================= -->
+  <!-- producer -->
+  <rect x="40" y="142" width="150" height="124" rx="10" fill="#182130" stroke="#2d3a4b" stroke-width="2"/>
+  <text x="115" y="170" font-size="15" fill="#7d8896" text-anchor="middle">PRODUCER</text>
+  <text x="115" y="192" font-size="12.5" fill="#55606e" text-anchor="middle">always has data</text>
+  <text id="prodState" x="115" y="252" font-size="12.5" font-weight="600" fill="#2ecc8f" text-anchor="middle">sending</text>
+
+  <!-- stage -->
+  <rect id="stageBox" x="470" y="132" width="250" height="144" rx="12" fill="#131c28" stroke="#2d3a4b" stroke-width="2" class="soft"/>
+  <text x="595" y="157" font-size="15" font-weight="600" fill="#7d8896" text-anchor="middle">THIS STAGE</text>
+  <rect id="regBox" x="547" y="164" width="96" height="72" rx="8" fill="none" stroke="#2d3a4b" stroke-width="2" stroke-dasharray="6 5" class="soft"/>
+  <text id="stageState" x="595" y="264" font-size="13" font-weight="600" fill="#7d8896" text-anchor="middle">empty</text>
+
+  <!-- consumer -->
+  <rect x="1010" y="142" width="160" height="124" rx="10" fill="#182130" stroke="#2d3a4b" stroke-width="2"/>
+  <text x="1090" y="170" font-size="15" fill="#7d8896" text-anchor="middle">DOWNSTREAM</text>
+  <text id="consState" x="1090" y="252" font-size="12.5" font-weight="600" fill="#2ecc8f" text-anchor="middle">taking</text>
+
+  <!-- forward (data + valid) wires -->
+  <line id="wIV" x1="192" y1="200" x2="466" y2="200" stroke="#48566b" stroke-width="3" marker-end="url(#arrow)" class="soft"/>
+  <line id="wOV" x1="722" y1="200" x2="1006" y2="200" stroke="#48566b" stroke-width="3" marker-end="url(#arrow)" class="soft"/>
+  <text id="lIV" x="330" y="156" font-size="14" font-weight="600" fill="#7d8896" text-anchor="middle" class="mono">input_valid = 1</text>
+  <text id="lOV" x="864" y="156" font-size="14" font-weight="600" fill="#7d8896" text-anchor="middle" class="mono">output_valid = 0</text>
+
+  <!-- backward (ready) wires -->
+  <line id="wIR" x1="466" y1="242" x2="194" y2="242" stroke="#48566b" stroke-width="3" marker-end="url(#arrow)" class="soft"/>
+  <line id="wOR" x1="1006" y1="242" x2="724" y2="242" stroke="#48566b" stroke-width="3" marker-end="url(#arrow)" class="soft"/>
+  <text id="lIR" x="330" y="270" font-size="14" font-weight="600" fill="#7d8896" text-anchor="middle" class="mono">input_ready = 1</text>
+  <text id="lOR" x="864" y="270" font-size="14" font-weight="600" fill="#7d8896" text-anchor="middle" class="mono">output_ready = 1</text>
+
+  <!-- moving items -->
+  <g id="chips"></g>
+
+  <!-- ================= band C : the verdict line ================= -->
+  <text id="verdict" x="640" y="306" font-size="18" font-weight="700" fill="#2ecc8f" text-anchor="middle">EMPTY - nothing to destroy, so accept</text>
+
+  <!-- ================= band D left : truth table ================= -->
+  <rect x="48" y="320" width="564" height="160" rx="10" fill="#131922" stroke="#1e2735"/>
+  <text x="70" y="348" font-size="15" font-weight="700" fill="#e6edf3">The only two cases where I can accept</text>
+  <text x="110" y="376" font-size="12.5" fill="#7d8896" text-anchor="middle" class="mono">output_valid</text>
+  <text x="240" y="376" font-size="12.5" fill="#7d8896" text-anchor="middle" class="mono">output_ready</text>
+  <text x="368" y="376" font-size="12.5" fill="#7d8896" text-anchor="middle" class="mono">input_ready</text>
+  <line x1="64" y1="386" x2="596" y2="386" stroke="#1e2735" stroke-width="1.5"/>
+
+  <rect id="rowEmpty" x="62" y="392" width="536" height="27" rx="6" fill="#2ecc8f" opacity="0"/>
+  <text x="110" y="411" font-size="16" font-weight="700" fill="#e6edf3" text-anchor="middle" class="mono">0</text>
+  <text x="240" y="411" font-size="16" font-weight="700" fill="#55606e" text-anchor="middle" class="mono">×</text>
+  <text id="cellEmpty" x="368" y="411" font-size="16" font-weight="700" fill="#2ecc8f" text-anchor="middle" class="mono">1</text>
+  <text x="416" y="411" font-size="12.5" fill="#7d8896">empty - nothing to destroy</text>
+
+  <rect id="rowDrain" x="62" y="423" width="536" height="27" rx="6" fill="#2ecc8f" opacity="0"/>
+  <text x="110" y="442" font-size="16" font-weight="700" fill="#e6edf3" text-anchor="middle" class="mono">1</text>
+  <text x="240" y="442" font-size="16" font-weight="700" fill="#e6edf3" text-anchor="middle" class="mono">1</text>
+  <text id="cellDrain" x="368" y="442" font-size="16" font-weight="700" fill="#2ecc8f" text-anchor="middle" class="mono">1</text>
+  <text id="noteDrain" x="416" y="442" font-size="12.5" fill="#7d8896">draining - out and in, same edge</text>
+
+  <rect id="rowBlock" x="62" y="454" width="536" height="27" rx="6" fill="#ff4d5a" opacity="0"/>
+  <text x="110" y="473" font-size="16" font-weight="700" fill="#e6edf3" text-anchor="middle" class="mono">1</text>
+  <text x="240" y="473" font-size="16" font-weight="700" fill="#e6edf3" text-anchor="middle" class="mono">0</text>
+  <text x="368" y="473" font-size="16" font-weight="700" fill="#ff4d5a" text-anchor="middle" class="mono">0</text>
+  <text x="416" y="473" font-size="12.5" fill="#7d8896">full and blocked - must hold</text>
+
+  <!-- ================= band D right : the gates ================= -->
+  <rect x="636" y="320" width="596" height="160" rx="10" fill="#131922" stroke="#1e2735"/>
+  <text x="698" y="348" font-size="15" font-weight="700" fill="#e6edf3">In gates</text>
+
+  <text id="gLabV" x="788" y="391" font-size="13.5" fill="#7d8896" text-anchor="end" class="mono">output_valid = 0</text>
+  <line id="gWireV" x1="794" y1="386" x2="830" y2="386" stroke="#48566b" stroke-width="2.5" class="soft"/>
+  <path id="gInv" d="M830,368 L830,404 L862,386 Z" fill="#182130" stroke="#48566b" stroke-width="2.5" class="soft"/>
+  <circle id="gInvBub" cx="867" cy="386" r="5" fill="#182130" stroke="#48566b" stroke-width="2.5" class="soft"/>
+  <line id="gWireN" x1="873" y1="386" x2="926" y2="386" stroke="#48566b" stroke-width="2.5" class="soft"/>
+  <text id="gValN" x="899" y="374" font-size="13" font-weight="700" fill="#7d8896" text-anchor="middle" class="mono">1</text>
+
+  <text id="gLabR" x="788" y="431" font-size="13.5" fill="#7d8896" text-anchor="end" class="mono">output_ready = 1</text>
+  <line id="gWireR" x1="794" y1="426" x2="926" y2="426" stroke="#48566b" stroke-width="2.5" class="soft"/>
+
+  <g id="gCut" opacity="0">
+    <line x1="838" y1="416" x2="858" y2="436" stroke="#ff4d5a" stroke-width="3"/>
+    <line x1="858" y1="416" x2="838" y2="436" stroke="#ff4d5a" stroke-width="3"/>
+    <text x="882" y="418" font-size="12.5" font-weight="700" fill="#ff4d5a" text-anchor="middle" class="mono">tied 0</text>
+  </g>
+
+  <path id="gOr" d="M876,360 C900,378 900,434 876,452 C920,452 946,436 958,406 C946,376 920,360 876,360 Z"
+        fill="#182130" stroke="#48566b" stroke-width="2.5" class="soft"/>
+  <text x="920" y="412" font-size="13" font-weight="700" fill="#55606e" text-anchor="middle">OR</text>
+  <line id="gWireO" x1="958" y1="406" x2="1052" y2="406" stroke="#48566b" stroke-width="2.5" class="soft"/>
+  <text id="gLabOut" x="1062" y="400" font-size="13.5" fill="#7d8896" class="mono">input_ready</text>
+  <text id="gValOut" x="1062" y="432" font-size="26" font-weight="700" fill="#2ecc8f" class="mono">1</text>
+
+  <text id="gSubst" x="974" y="466" font-size="14.5" font-weight="600" fill="#7d8896" text-anchor="middle" class="mono">!0 || 1  =  1</text>
+
+  <!-- ================= band E : waveform ================= -->
+  <g transform="translate(0,485)">
+    <rect x="48" y="0" width="1184" height="234" rx="10" fill="#131922" stroke="#1e2735"/>
+    <g id="waveBands"></g>
+    <g id="waveGrid"></g>
+    <text x="196" y="39" font-size="13" fill="#7d8896" text-anchor="end" class="mono">clk</text>
+    <text x="196" y="81" font-size="13" fill="#7d8896" text-anchor="end" class="mono">output_ready</text>
+    <text x="196" y="121" font-size="13" fill="#7d8896" text-anchor="end" class="mono">output_valid</text>
+    <text x="196" y="161" font-size="13" fill="#7d8896" text-anchor="end" class="mono">input_ready</text>
+    <text x="196" y="195" font-size="13" fill="#7d8896" text-anchor="end" class="mono">accepted</text>
+    <text x="196" y="223" font-size="13" fill="#7d8896" text-anchor="end" class="mono">delivered</text>
+    <g id="waveSigs"></g>
+    <g id="waveEvents"></g>
+  </g>
+</svg>
+</div>
+
+<div id="controls">
+  <button id="play">▶ Play</button>
+  <button id="step">Step ▸</button>
+  <button id="reset">↺ Reset</button>
+  <button id="mode" class="on">Rule: CORRECT</button>
+  <label>speed <input id="speed" type="range" min="250" max="1600" value="900" step="50"></label>
+  <span class="hint">space = play/pause · → = step · R = reset · M = swap rule</span>
+</div>
+
+<script>
+(() => {
+  // ------------------------------------------------------------------ config
+  const SLOTS = { in: [330, 200], s: [595, 200], out: [1090, 200], gone: [1250, 200] };
+  const LABELS = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+  // downstream availability, one entry per cycle (repeats)
+  const READY = [1,1,1,1,1, 0,0,0, 1,1,1,1, 0, 1,1,1,1,1,1,1];
+  const WIN = 16, X0 = 210, CW = 62;
+
+  const C = { ok:"#2ecc8f", stall:"#ff4d5a", warn:"#ffb454", dim:"#7d8896",
+              dimmer:"#55606e", wire:"#48566b", text:"#e6edf3", chip:"#33a3ff" };
+
+  // ------------------------------------------------------------------ state
+  let correct = true;                 // rule under test
+  let st = null;                      // registered state at start of current cycle
+  let hist = [];                      // committed combinational records, index = cycle
+  let chips = [];                     // {id,label,slot,node,dying}
+  let accepted = 0, bubbles = 0, chipId = 0, nextLabel = 0;
+  let playing = false, timer = null;
+
+  const $ = id => document.getElementById(id);
+  const el = (n, a) => { const e = document.createElementNS("http://www.w3.org/2000/svg", n);
+    for (const k in a) e.setAttribute(k, a[k]); return e; };
+
+  function resetAll() {
+    stop();
+    hist = []; accepted = 0; bubbles = 0; nextLabel = 0; chipId = 0;
+    $("chips").textContent = "";
+    chips = [];
+    st = { cycle: 0, full: false, held: null, pending: LABELS[nextLabel++] };
+    spawn(st.pending);                         // producer always presents an item
+    render();
+  }
+
+  // ------------------------------------------------------------- combinational
+  // Everything a stage can see during cycle `s.cycle`, derived from registers only.
+  function comb(s) {
+    const outValid = s.full;
+    const outReady = READY[s.cycle % READY.length] === 1;
+    const inValid  = true;                     // producer never runs dry here
+    const inReady  = correct ? (!outValid || outReady) : (!outValid);
+    const xferIn   = inValid && inReady;
+    const xferOut  = outValid && outReady;
+    // a cycle the correct rule would have used, and the naive rule threw away
+    const wasted   = outValid && outReady && !inReady;
+    let kase = "empty";
+    if (outValid && outReady) kase = wasted ? "refused" : "drain";
+    else if (outValid)        kase = "block";
+    return { outValid, outReady, inValid, inReady, xferIn, xferOut, wasted, kase,
+             inLabel: s.pending, outLabel: s.held };
+  }
+
+  // ------------------------------------------------------------------ chips
+  function spawn(label) {
+    const g = el("g", { class: "chip no-anim", transform: `translate(${SLOTS.in})` });
+    g.appendChild(el("rect", { x:-34, y:-30, width:68, height:60, rx:8,
+      fill: C.chip, "fill-opacity":0.18, stroke: C.chip, "stroke-width":2.5 }));
+    const t = el("text", { x:0, y:12, "font-size":32, "font-weight":700,
+      fill: C.chip, "text-anchor":"middle" });
+    t.textContent = label;
+    g.appendChild(t);
+    $("chips").appendChild(g);
+    g.getBoundingClientRect();                 // force layout before first move
+    g.classList.remove("no-anim");
+    const c = { id: chipId++, label, slot: "in", node: g };
+    chips.push(c);
+    return c;
+  }
+
+  function place() {
+    for (const c of chips) {
+      c.node.setAttribute("transform", `translate(${SLOTS[c.slot]})`);
+      c.node.setAttribute("opacity", c.slot === "gone" ? 0 : 1);
+    }
+  }
+
+  // ------------------------------------------------------------------- tick
+  function tick() {
+    const c = comb(st);
+    hist[st.cycle] = c;
+    if (c.xferIn)  accepted++;
+    if (c.wasted)  bubbles++;
+
+    // retire whatever was already delivered, then move on the same edge
+    for (const ch of chips.filter(x => x.slot === "out")) { ch.slot = "gone"; ch.dying = true; }
+    if (c.xferOut) { const held = chips.find(x => x.slot === "s"); if (held) held.slot = "out"; }
+    if (c.xferIn)  { const incoming = chips.find(x => x.slot === "in"); if (incoming) incoming.slot = "s"; }
+
+    // next registered state - computed from the pre-edge snapshot only.
+    // Set on a transfer in, clear on a transfer out, hold otherwise. This is
+    // equivalent to `if (input_ready) valid <= input_valid` under the correct
+    // ready rule, and is the only form the naive rule can also live with.
+    st = {
+      cycle:   st.cycle + 1,
+      full:    c.xferIn ? true  : (c.xferOut ? false : c.outValid),
+      held:    c.xferIn ? c.inLabel : (c.xferOut ? null : st.held),
+      pending: c.xferIn ? LABELS[nextLabel++ % LABELS.length] : st.pending
+    };
+
+    place();
+    if (c.xferIn) spawn(st.pending);
+    setTimeout(() => {
+      chips = chips.filter(x => { if (x.dying) { x.node.remove(); return false; } return true; });
+    }, 420);
+    render();
+  }
+
+  // ------------------------------------------------------------------ render
+  function render() {
+    const c = comb(st);
+    const on = v => v ? C.ok : C.dimmer;
+    const b = v => v ? "1" : "0";
+
+    $("cycleNum").textContent = st.cycle;
+    $("acceptedNum").textContent = accepted;
+    $("bubbleNum").textContent = bubbles;
+    $("bubbleNum").setAttribute("fill", bubbles ? C.stall : C.ok);
+
+    $("title").textContent = correct
+      ? "Deriving input_ready: when can this stage accept?"
+      : "The tempting version: accept only when I am empty";
+    $("subtitle").textContent = correct
+      ? "input_ready = !output_valid || output_ready"
+      : "input_ready = !output_valid          ← halves the throughput";
+    $("subtitle").setAttribute("fill", correct ? C.dim : C.warn);
+    $("mode").textContent = correct ? "Rule: CORRECT" : "Rule: NAIVE";
+    $("mode").className = correct ? "on" : "bad";
+
+    // ---- stage scene
+    $("lIV").textContent = "input_valid = 1";
+    $("lIV").setAttribute("fill", C.ok);
+    $("lOV").textContent = "output_valid = " + b(c.outValid);
+    $("lOV").setAttribute("fill", on(c.outValid));
+    $("lIR").textContent = "input_ready = " + b(c.inReady);
+    $("lIR").setAttribute("fill", c.inReady ? C.ok : C.stall);
+    $("lOR").textContent = "output_ready = " + b(c.outReady);
+    $("lOR").setAttribute("fill", c.outReady ? C.ok : C.stall);
+
+    wire($("wIV"), true);
+    wire($("wOV"), c.outValid);
+    wire($("wIR"), c.inReady, true);
+    wire($("wOR"), c.outReady, true);
+
+    $("stageBox").setAttribute("stroke", c.outValid ? C.chip : "#2d3a4b");
+    $("regBox").setAttribute("stroke", c.outValid ? C.chip : "#2d3a4b");
+    $("stageState").textContent = c.outValid ? "holding " + st.held : "empty";
+    $("stageState").setAttribute("fill", c.outValid ? C.chip : C.dim);
+    $("consState").textContent = c.outReady ? "taking" : "STALLED";
+    $("consState").setAttribute("fill", c.outReady ? C.ok : C.stall);
+    $("prodState").textContent = c.inReady ? "sending" : "must wait";
+    $("prodState").setAttribute("fill", c.inReady ? C.ok : C.stall);
+
+    // ---- verdict
+    const V = {
+      empty:   ["EMPTY - nothing to destroy, so accept", C.ok],
+      drain:   ["DRAINING - old value leaves and new one loads on the same edge", C.ok],
+      block:   ["FULL and BLOCKED - hold everything, push back upstream", C.stall],
+      refused: ["FULL and DRAINING - but the naive rule refuses. One cycle wasted.", C.warn]
+    }[c.kase];
+    $("verdict").textContent = V[0];
+    $("verdict").setAttribute("fill", V[1]);
+
+    // ---- truth table
+    hl("rowEmpty", c.kase === "empty", C.ok);
+    hl("rowDrain", c.kase === "drain" || c.kase === "refused", correct ? C.ok : C.warn);
+    hl("rowBlock", c.kase === "block", C.stall);
+    $("cellDrain").textContent = correct ? "1" : "0";
+    $("cellDrain").setAttribute("fill", correct ? C.ok : C.stall);
+    $("noteDrain").textContent = correct ? "draining - out and in, same edge"
+                                         : "draining - but refused: a bubble";
+    $("noteDrain").setAttribute("fill", correct ? C.dim : C.warn);
+
+    // ---- gates
+    const orIn2 = correct ? c.outReady : false;
+    $("gLabV").textContent = "output_valid = " + b(c.outValid);
+    $("gLabV").setAttribute("fill", on(c.outValid));
+    $("gLabR").textContent = "output_ready = " + b(c.outReady);
+    $("gLabR").setAttribute("fill", correct ? on(c.outReady) : C.dimmer);
+    gwire("gWireV", c.outValid);
+    gwire("gWireN", !c.outValid);
+    gwire("gWireR", orIn2, !correct);
+    gwire("gWireO", c.inReady);
+    $("gValN").textContent = b(!c.outValid);
+    $("gValN").setAttribute("fill", on(!c.outValid));
+    $("gInv").setAttribute("stroke", on(!c.outValid));
+    $("gInvBub").setAttribute("stroke", on(!c.outValid));
+    $("gOr").setAttribute("stroke", c.inReady ? C.ok : C.wire);
+    $("gValOut").textContent = b(c.inReady);
+    $("gValOut").setAttribute("fill", c.inReady ? C.ok : C.stall);
+    $("gCut").setAttribute("opacity", correct ? 0 : 1);
+    $("gSubst").textContent = correct
+      ? `!${b(c.outValid)} || ${b(c.outReady)}  =  ${b(c.inReady)}`
+      : `!${b(c.outValid)}  =  ${b(c.inReady)}`;
+    $("gSubst").setAttribute("fill", c.inReady ? C.ok : C.stall);
+
+    drawWaves();
+    place();
+  }
+
+  function wire(node, hot, back) {
+    node.setAttribute("stroke", hot ? (back ? C.ok : C.ok) : (back ? C.stall : C.wire));
+    node.setAttribute("marker-end", hot ? "url(#arrowOk)" : (back ? "url(#arrowStall)" : "url(#arrow)"));
+  }
+  function gwire(id, hot, cut) {
+    const n = $(id);
+    n.setAttribute("stroke", cut ? "#2d3a4b" : (hot ? C.ok : C.wire));
+  }
+  function hl(id, active, color) {
+    const n = $(id);
+    n.setAttribute("opacity", active ? 0.17 : 0);
+    n.setAttribute("fill", color);
+  }
+
+  // ------------------------------------------------------------------ waves
+  const ROWS = [
+    { y: 76,  key: "outReady" },
+    { y: 116, key: "outValid" },
+    { y: 156, key: "inReady"  }
+  ];
+
+  function valAt(i) { return i === st.cycle ? comb(st) : hist[i]; }
+
+  function drawWaves() {
+    const start = Math.max(0, st.cycle - WIN + 1);
+    const grid = $("waveGrid"), sigs = $("waveSigs"), evs = $("waveEvents"), bands = $("waveBands");
+    grid.textContent = ""; sigs.textContent = ""; evs.textContent = ""; bands.textContent = "";
+
+    // stall / bubble shading + current-cycle cursor
+    for (let j = 0; j < WIN; j++) {
+      const i = start + j, v = valAt(i);
+      if (!v) continue;
+      const x = X0 + j * CW;
+      if (v.wasted)
+        bands.appendChild(el("rect", { x, y: 54, width: CW, height: 112,
+          fill: C.warn, opacity: 0.15 }));
+      else if (!v.inReady)
+        bands.appendChild(el("rect", { x, y: 54, width: CW, height: 112,
+          fill: C.stall, opacity: 0.11 }));
+      if (i === st.cycle)
+        bands.appendChild(el("rect", { x, y: 18, width: CW, height: 212,
+          fill: "#8ab4ff", opacity: 0.07 }));
+    }
+
+    // column grid + cycle numbers
+    for (let j = 0; j <= WIN; j++) {
+      const x = X0 + j * CW;
+      grid.appendChild(el("line", { x1: x, y1: 18, x2: x, y2: 230,
+        stroke: "#1e2735", "stroke-width": 1 }));
+      if (j < WIN) {
+        const t = el("text", { x: x + CW / 2, y: 14, "font-size": 11,
+          fill: start + j === st.cycle ? "#8ab4ff" : "#3f4b5c", "text-anchor": "middle" });
+        t.textContent = start + j;
+        grid.appendChild(t);
+      }
+    }
+
+    // clock
+    let d = "";
+    for (let j = 0; j < WIN; j++) {
+      const x = X0 + j * CW;
+      d += `M${x},44 L${x},26 L${x + CW / 2},26 L${x + CW / 2},44 L${x + CW},44 `;
+    }
+    sigs.appendChild(el("path", { d, stroke: "#3d4d63", "stroke-width": 2, fill: "none" }));
+
+    // signal rows
+    for (const r of ROWS) {
+      const hi = r.y - 20, lo = r.y - 2;
+      let p = "", prev = null;
+      for (let j = 0; j < WIN; j++) {
+        const v = valAt(start + j);
+        if (!v) break;
+        const lvl = v[r.key] ? hi : lo, x = X0 + j * CW;
+        if (prev === null) p += `M${x},${lvl} `;
+        else if (prev !== lvl) p += `L${x},${prev} L${x},${lvl} `;
+        p += `L${x + CW},${lvl} `;
+        prev = lvl;
+      }
+      sigs.appendChild(el("path", { d: p, stroke: r.key === "inReady" ? "#ffb454" : "#8ab4ff",
+        "stroke-width": 2.5, fill: "none", "stroke-linejoin": "round" }));
+    }
+
+    // event rows
+    for (let j = 0; j < WIN; j++) {
+      const i = start + j, v = valAt(i);
+      if (!v) break;
+      const cx = X0 + j * CW + CW / 2;
+      if (v.xferIn) tag(evs, cx, 190, v.inLabel, C.ok);
+      else if (v.wasted) tag(evs, cx, 190, "lost", C.warn);
+      if (v.xferOut) tag(evs, cx, 218, v.outLabel, C.chip);
+    }
+  }
+
+  function tag(g, cx, cy, txt, color) {
+    const w = txt.length > 1 ? 48 : 34;
+    g.appendChild(el("rect", { x: cx - w / 2, y: cy - 11, width: w, height: 22, rx: 6,
+      fill: color, "fill-opacity": 0.16, stroke: color, "stroke-width": 1.5 }));
+    const t = el("text", { x: cx, y: cy + 5, "font-size": txt.length > 1 ? 11.5 : 13,
+      "font-weight": 700, fill: color, "text-anchor": "middle" });
+    t.textContent = txt;
+    g.appendChild(t);
+  }
+
+  // ---------------------------------------------------------------- controls
+  function play(v) {
+    playing = v;
+    $("play").textContent = v ? "❚❚ Pause" : "▶ Play";
+    $("play").className = v ? "on" : "";
+    clearInterval(timer);
+    if (v) timer = setInterval(tick, +$("speed").value);
+  }
+  function stop() { play(false); }
+
+  $("play").onclick  = () => play(!playing);
+  $("step").onclick  = () => { stop(); tick(); };
+  $("reset").onclick = resetAll;
+  $("mode").onclick  = () => { correct = !correct; resetAll(); };
+  $("speed").oninput = () => { if (playing) play(true); };
+
+  addEventListener("keydown", e => {
+    if (e.key === " ") { e.preventDefault(); play(!playing); }
+    else if (e.key === "ArrowRight") { stop(); tick(); }
+    else if (e.key.toLowerCase() === "r") resetAll();
+    else if (e.key.toLowerCase() === "m") { correct = !correct; resetAll(); }
+  });
+
+  // ------------------------------------------------------------- deep links
+  const q = new URLSearchParams(location.search);
+  correct = q.get("rule") !== "naive" && q.get("mode") !== "naive";
+  resetAll();
+  const n = +(q.get("steps") || 0);
+  for (let i = 0; i < n; i++) tick();
+  if (q.get("play") === "1") play(true);
+})();
+</script>
+</body>
+</html>

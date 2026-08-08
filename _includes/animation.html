@@ -1,0 +1,92 @@
+{% comment %}
+  Embeds a self-contained HTML animation from /assets/animations/ in an iframe.
+
+  Usage:
+    {% include animation.html
+       src="/assets/animations/22-input-ready.html"
+       title="Deriving input_ready"
+       caption="Figure 3b: ..." %}
+
+  The iframe isolates the animation's global CSS, IDs and keyboard handlers from
+  the Minimal Mistakes page. Its height is synced to the content by the script
+  below (same origin, so the parent can measure it).
+{% endcomment %}
+
+<style>
+  .anim-embed {
+    display: block;
+    margin: 1.5em 0 2em;
+  }
+  .anim-embed .anim-frame {
+    display: block;
+    width: 100%;
+    border: 1px solid #1e2735;
+    border-radius: 8px;
+    background: #0d1117;
+    /* fallback before the height sync runs */
+    aspect-ratio: 1280 / 800;
+  }
+  .anim-embed figcaption {
+    margin-top: 0.5em;
+    font-size: 0.8em;
+    line-height: 1.5;
+    color: #7a8288;
+  }
+  .anim-embed .anim-open {
+    white-space: nowrap;
+  }
+</style>
+
+<figure class="anim-embed">
+  <iframe class="anim-frame"
+          src="{{ include.src | relative_url }}"
+          title="{{ include.title | default: 'Interactive animation' | escape }}"
+          loading="lazy"
+          scrolling="no"
+          allowfullscreen></iframe>
+  <figcaption>
+    {{ include.caption }}
+    <a class="anim-open" href="{{ include.src | relative_url }}" target="_blank" rel="noopener">Open in a new tab &#8599;</a>
+  </figcaption>
+</figure>
+
+<script>
+(function () {
+  if (window.__animEmbedInit) return;   // emitted once per include, run once per page
+  window.__animEmbedInit = true;
+
+  function fit(f) {
+    try {
+      var d = f.contentDocument;
+      if (!d || !d.documentElement) return;
+      f.style.height = Math.ceil(d.documentElement.getBoundingClientRect().height) + "px";
+    } catch (e) { /* ignore */ }
+  }
+
+  function attach(f) {
+    if (f.dataset.animInit) return;
+    f.dataset.animInit = "1";
+    var run = function () {
+      fit(f);
+      try {
+        if (window.ResizeObserver && f.contentDocument) {
+          new ResizeObserver(function () { fit(f); }).observe(f.contentDocument.documentElement);
+        }
+      } catch (e) { /* ignore */ }
+    };
+    f.addEventListener("load", run);
+    if (f.contentDocument && f.contentDocument.readyState === "complete") run();
+  }
+
+  function scan() {
+    Array.prototype.forEach.call(document.querySelectorAll("iframe.anim-frame"), attach);
+  }
+
+  scan();
+  document.addEventListener("DOMContentLoaded", scan);
+  window.addEventListener("load", scan);
+  window.addEventListener("resize", function () {
+    Array.prototype.forEach.call(document.querySelectorAll("iframe.anim-frame"), fit);
+  });
+})();
+</script>
