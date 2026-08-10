@@ -1,0 +1,406 @@
+{% comment %}
+  Renders an interactive multiple-choice quiz from _data/quizzes/<id>.yml.
+
+  Usage:
+    {% include quiz.html id="22-pipeline" %}
+
+  The data file supplies title, intro, pass_mark and a list of questions; see
+  _data/quizzes/22-pipeline.yml for the field reference. Everything here is
+  inline and dependency-free, so the quiz works on a plain GitHub Pages build.
+{% endcomment %}
+
+{% assign quiz = site.data.quizzes[include.id] %}
+{% assign letters = "A,B,C,D,E,F" | split: "," %}
+
+<style>
+  .qz {
+    --qz-bg: #ffffff;
+    --qz-panel: #f7f8fa;
+    --qz-line: #dde1e6;
+    --qz-text: #24292f;
+    --qz-dim: #656d76;
+    --qz-accent: #2a5298;
+    --qz-ok: #1a7f5a;
+    --qz-ok-bg: #e8f6ef;
+    --qz-bad: #c0392b;
+    --qz-bad-bg: #fdeceb;
+
+    margin: 2em 0;
+    border: 1px solid var(--qz-line);
+    border-radius: 10px;
+    background: var(--qz-bg);
+    color: var(--qz-text);
+    font-size: 0.92em;
+    line-height: 1.6;
+    overflow: hidden;
+  }
+
+  /* ---------------------------------------------------------------- header */
+  .qz__head {
+    padding: 1.1em 1.3em;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 55%, #4b2d8f 100%);
+    color: #fff;
+  }
+  .qz__title {
+    margin: 0 0 .35em;
+    font-size: 1.15em;
+    font-weight: 700;
+    line-height: 1.3;
+    color: #fff;
+  }
+  .qz__intro {
+    margin: 0;
+    font-size: .9em;
+    color: rgba(255, 255, 255, .82);
+  }
+  .qz__bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4em 1.2em;
+    align-items: center;
+    padding: .6em 1.3em;
+    border-bottom: 1px solid var(--qz-line);
+    background: var(--qz-panel);
+    font-size: .82em;
+    color: var(--qz-dim);
+  }
+  .qz__score { font-weight: 700; color: var(--qz-text); }
+  .qz__track {
+    display: block;
+    flex: 1 1 120px;
+    min-width: 100px;
+    height: 5px;
+    border-radius: 3px;
+    background: var(--qz-line);
+    overflow: hidden;
+  }
+  .qz__fill {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--qz-accent);
+    transition: width .3s ease;
+  }
+
+  /* -------------------------------------------------------------- question */
+  .qz__q { padding: 1.3em; border-top: 1px solid var(--qz-line); }
+  .qz__q:first-of-type { border-top: 0; }
+
+  .qz__meta {
+    display: flex;
+    gap: .6em;
+    align-items: center;
+    margin-bottom: .55em;
+    font-size: .78em;
+    color: var(--qz-dim);
+  }
+  .qz__num { font-weight: 700; color: var(--qz-accent); }
+  .qz__tag {
+    padding: .1em .55em;
+    border: 1px solid var(--qz-line);
+    border-radius: 20px;
+    background: var(--qz-panel);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    font-size: .9em;
+  }
+  .qz__stem { margin: 0 0 .9em; }
+  .qz__stem > p:last-child { margin-bottom: 0; }
+
+  .qz__code {
+    margin: 0 0 1em;
+    padding: .7em .9em;
+    border: 1px solid var(--qz-line);
+    border-left: 3px solid var(--qz-accent);
+    border-radius: 5px;
+    background: var(--qz-panel);
+    font-family: Monaco, Consolas, "Liberation Mono", monospace;
+    font-size: .85em;
+    line-height: 1.5;
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  /* --------------------------------------------------------------- options */
+  .qz__opts { display: grid; gap: .5em; }
+  .qz__opt {
+    display: flex;
+    gap: .75em;
+    align-items: flex-start;
+    width: 100%;
+    padding: .7em .85em;
+    border: 1px solid var(--qz-line);
+    border-radius: 7px;
+    background: var(--qz-bg);
+    color: var(--qz-text);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .qz__opt:hover:not([disabled]) { border-color: var(--qz-accent); background: var(--qz-panel); }
+  .qz__opt[disabled] { cursor: default; opacity: .72; }
+
+  .qz__letter {
+    flex: 0 0 auto;
+    width: 1.55em;
+    height: 1.55em;
+    border: 1px solid var(--qz-line);
+    border-radius: 50%;
+    background: var(--qz-panel);
+    font-size: .82em;
+    font-weight: 700;
+    line-height: 1.5em;
+    text-align: center;
+  }
+  .qz__opt code {
+    padding: .1em .3em;
+    border-radius: 3px;
+    background: rgba(42, 82, 152, .09);
+    font-size: .88em;
+  }
+
+  .qz__opt.is-right,
+  .qz__opt.is-right[disabled] {
+    border-color: var(--qz-ok);
+    background: var(--qz-ok-bg);
+    opacity: 1;
+  }
+  .qz__opt.is-right .qz__letter { border-color: var(--qz-ok); background: var(--qz-ok); color: #fff; }
+  .qz__opt.is-wrong,
+  .qz__opt.is-wrong[disabled] {
+    border-color: var(--qz-bad);
+    background: var(--qz-bad-bg);
+    opacity: 1;
+  }
+  .qz__opt.is-wrong .qz__letter { border-color: var(--qz-bad); background: var(--qz-bad); color: #fff; }
+
+  /* ----------------------------------------------------------- explanation */
+  .qz__exp {
+    display: none;
+    margin-top: .85em;
+    padding: .8em 1em;
+    border-left: 3px solid var(--qz-accent);
+    border-radius: 0 6px 6px 0;
+    background: var(--qz-panel);
+    font-size: .93em;
+  }
+  .qz__exp.is-open { display: block; }
+  .qz__verdict { font-weight: 700; margin-bottom: .3em; }
+  .qz__verdict.ok { color: var(--qz-ok); }
+  .qz__verdict.bad { color: var(--qz-bad); }
+  .qz__exp p { margin: 0 0 .6em; }
+  .qz__exp p:last-child { margin-bottom: 0; }
+  .qz__exp code {
+    padding: .1em .3em;
+    border-radius: 3px;
+    background: rgba(42, 82, 152, .1);
+    font-size: .88em;
+  }
+  .qz__ref { display: inline-block; margin-top: .2em; font-size: .88em; }
+
+  /* --------------------------------------------------------------- summary */
+  .qz__result {
+    display: none;
+    padding: 1.4em 1.3em;
+    border-top: 1px solid var(--qz-line);
+    background: var(--qz-panel);
+    text-align: center;
+  }
+  .qz__result.is-open { display: block; }
+  .qz__final { font-size: 1.7em; font-weight: 700; line-height: 1.2; }
+  .qz__verdict-line { margin: .3em 0 1em; color: var(--qz-dim); }
+  .qz__again {
+    padding: .5em 1.4em;
+    border: 1px solid var(--qz-accent);
+    border-radius: 6px;
+    background: var(--qz-accent);
+    color: #fff;
+    font: inherit;
+    font-size: .9em;
+    cursor: pointer;
+  }
+  .qz__again:hover { background: #1e3c72; }
+
+  @media (prefers-color-scheme: dark) {
+    .qz {
+      --qz-bg: #131922;
+      --qz-panel: #1a2130;
+      --qz-line: #2d3a4b;
+      --qz-text: #e6edf3;
+      --qz-dim: #8b96a5;
+      --qz-accent: #4a90d9;
+      --qz-ok: #2ecc8f;
+      --qz-ok-bg: rgba(46, 204, 143, .12);
+      --qz-bad: #ff6b76;
+      --qz-bad-bg: rgba(255, 77, 90, .12);
+    }
+    .qz__opt.is-right .qz__letter,
+    .qz__opt.is-wrong .qz__letter { color: #0d1117; }
+    .qz__again { color: #0d1117; }
+  }
+</style>
+
+<section class="qz" id="qz-{{ include.id }}" data-pass="{{ quiz.pass_mark | default: 0 }}">
+  <div class="qz__head">
+    <p class="qz__title">{{ quiz.title }}</p>
+    {% if quiz.intro %}<p class="qz__intro">{{ quiz.intro }}</p>{% endif %}
+  </div>
+
+  <div class="qz__bar">
+    <span class="qz__score" data-qz-score>0 / {{ quiz.questions | size }}</span>
+    <span data-qz-progress>0 answered</span>
+    <span class="qz__track"><span class="qz__fill" data-qz-fill></span></span>
+  </div>
+
+  {% for q in quiz.questions %}
+  <div class="qz__q" data-qz-question data-answer="{{ q.answer }}">
+    <div class="qz__meta">
+      <span class="qz__num">Q{{ forloop.index }}</span>
+      {% if q.tag %}<span class="qz__tag">{{ q.tag }}</span>{% endif %}
+    </div>
+
+    <div class="qz__stem">{{ q.question | markdownify }}</div>
+    {% if q.code %}<div class="qz__code">{{ q.code | strip | escape }}</div>{% endif %}
+
+    <div class="qz__opts">
+      {% for opt in q.options %}
+      <button type="button" class="qz__opt" data-qz-option data-index="{{ forloop.index0 }}">
+        <span class="qz__letter" aria-hidden="true">{{ letters[forloop.index0] }}</span>
+        <span>{{ opt.text | markdownify | remove_first: '<p>' | remove: '</p>' | strip }}</span>
+      </button>
+      {% endfor %}
+    </div>
+
+    <div class="qz__exp" data-qz-explanation>
+      <div class="qz__verdict" data-qz-verdict></div>
+      {{ q.explanation | markdownify }}
+      {% if q.ref_link %}
+      <a class="qz__ref" href="{{ q.ref_link }}">Review: {{ q.ref_text | default: "this section" }} &#8599;</a>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+
+  <div class="qz__result" data-qz-result>
+    <div class="qz__final" data-qz-final></div>
+    <p class="qz__verdict-line" data-qz-message></p>
+    <button type="button" class="qz__again" data-qz-reset>Try again</button>
+  </div>
+</section>
+
+<script>
+(function () {
+  if (window.__qzInit) return;      // include may appear more than once per page
+  window.__qzInit = true;
+
+  function setup(root) {
+    if (root.dataset.qzReady) return;
+    root.dataset.qzReady = "1";
+
+    var questions = Array.prototype.slice.call(root.querySelectorAll("[data-qz-question]"));
+    var total     = questions.length;
+    var pass      = parseInt(root.dataset.pass, 10) || Math.ceil(total * 0.7);
+    var scoreEl   = root.querySelector("[data-qz-score]");
+    var progEl    = root.querySelector("[data-qz-progress]");
+    var fillEl    = root.querySelector("[data-qz-fill]");
+    var resultEl  = root.querySelector("[data-qz-result]");
+    var finalEl   = root.querySelector("[data-qz-final]");
+    var msgEl     = root.querySelector("[data-qz-message]");
+    var answered  = 0;
+    var correct   = 0;
+    var LETTERS   = "ABCDEF";
+
+    // The data file lists the right answer first, so present the options in a
+    // random order. Correctness is checked against data-index, which travels
+    // with the node, so only the visible letter badges need renumbering.
+    function shuffle(q) {
+      var box  = q.querySelector(".qz__opts");
+      var opts = Array.prototype.slice.call(box.children);
+      for (var i = opts.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var t = opts[i]; opts[i] = opts[j]; opts[j] = t;
+      }
+      opts.forEach(function (o, k) {
+        o.querySelector(".qz__letter").textContent = LETTERS.charAt(k);
+        box.appendChild(o);
+      });
+    }
+
+    function refresh() {
+      scoreEl.textContent = correct + " / " + total;
+      progEl.textContent  = answered + " of " + total + " answered";
+      fillEl.style.width  = (answered / total * 100) + "%";
+
+      if (answered < total) return;
+
+      var pct = Math.round(correct / total * 100);
+      finalEl.textContent = correct + " / " + total + "  (" + pct + "%)";
+      msgEl.textContent =
+        correct === total ? "Every one. You can derive this pipeline from scratch." :
+        correct >= pass   ? "Solid. The handshake rules are in place — re-read the ones you missed." :
+                            "Worth another pass through the post: focus on how input_ready is derived and where backpressure travels.";
+      resultEl.classList.add("is-open");
+    }
+
+    function answer(q, picked) {
+      if (q.dataset.done) return;
+      q.dataset.done = "1";
+
+      var right   = parseInt(q.dataset.answer, 10);
+      var isRight = picked === right;
+      var opts    = q.querySelectorAll("[data-qz-option]");
+
+      Array.prototype.forEach.call(opts, function (o) {
+        var i = parseInt(o.dataset.index, 10);
+        o.disabled = true;
+        if (i === right)                 o.classList.add("is-right");
+        else if (i === picked)           o.classList.add("is-wrong");
+      });
+
+      var verdict = q.querySelector("[data-qz-verdict]");
+      verdict.textContent = isRight ? "Correct" : "Not quite";
+      verdict.className = "qz__verdict " + (isRight ? "ok" : "bad");
+      q.querySelector("[data-qz-explanation]").classList.add("is-open");
+
+      answered++;
+      if (isRight) correct++;
+      refresh();
+    }
+
+    root.addEventListener("click", function (e) {
+      var opt = e.target.closest("[data-qz-option]");
+      if (opt && root.contains(opt)) {
+        answer(opt.closest("[data-qz-question]"), parseInt(opt.dataset.index, 10));
+        return;
+      }
+      if (e.target.closest("[data-qz-reset]")) {
+        answered = 0;
+        correct  = 0;
+        questions.forEach(function (q) {
+          delete q.dataset.done;
+          q.querySelector("[data-qz-explanation]").classList.remove("is-open");
+          Array.prototype.forEach.call(q.querySelectorAll("[data-qz-option]"), function (o) {
+            o.disabled = false;
+            o.classList.remove("is-right", "is-wrong");
+          });
+          shuffle(q);
+        });
+        resultEl.classList.remove("is-open");
+        refresh();
+        root.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+
+    questions.forEach(shuffle);
+    refresh();
+  }
+
+  function scan() {
+    Array.prototype.forEach.call(document.querySelectorAll(".qz"), setup);
+  }
+
+  scan();
+  document.addEventListener("DOMContentLoaded", scan);
+})();
+</script>

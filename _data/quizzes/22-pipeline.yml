@@ -1,0 +1,286 @@
+# Quiz for post 22: The Complete Guide to Hardware Pipeline Design with Backpressure
+#
+# Rendered by {% include quiz.html id="22-pipeline" %}
+#
+# Per question:
+#   tag         short chip shown above the stem (Concept / Trace / Protocol / Timing)
+#   question    the stem, markdown allowed
+#   code        optional monospace block shown under the stem
+#   options     list of { text }, markdown allowed. List the correct one first --
+#               the include shuffles option order on every load, so the authored
+#               order is never what the reader sees.
+#   answer      0-based index into options
+#   explanation shown after answering, markdown allowed
+#   ref_text    optional "review this" link label
+#   ref_link    anchor in the post
+
+title: "Check Yourself: Pipelines and Backpressure"
+intro: >-
+  Ten questions on the ready/valid pipeline from the video. They are written to be
+  answered by reasoning through the handshake, not by recalling a sentence, so expect
+  to trace a cycle or two on paper.
+pass_mark: 7
+
+questions:
+  - tag: Concept
+    question: >-
+      A single-cycle implementation of `y = (a*b) + (c*d) + e` closes timing at
+      **100 MHz**. You split it into three perfectly balanced stages and, ignoring
+      register overhead, the clock now closes at **300 MHz**. Once the pipeline is
+      full, what has actually changed for one item passing through the block?
+    options:
+      - text: >-
+          Throughput triples to 300 M results/s, while the latency of one item is
+          3 cycles at 3.33 ns ≈ 10 ns — essentially what it was before.
+      - text: Both throughput and latency improve by 3×.
+      - text: >-
+          Throughput is unchanged; only the clock frequency went up, so nothing real
+          was gained.
+      - text: Throughput triples and the latency of one item triples to 30 ns.
+    answer: 0
+    explanation: >-
+      Pipelining buys **throughput, not latency**. In the ideal balanced split the
+      same 10 ns of logic still has to be walked through, only now it is measured as
+      three short cycles instead of one long one - and in a real design the extra
+      setup + clock-to-Q per stage makes the wall-clock latency slightly *worse*.
+      What you gain is that a new item can be accepted **every cycle** instead of
+      every 10 ns.
+    ref_text: "Why Pipelining Helps Computation"
+    ref_link: "#why-pipelining-helps-computation"
+
+  - tag: Trace
+    question: >-
+      A stage implements the naive rule `input_ready = !output_valid`. The producer
+      always has data (`input_valid = 1`) and the consumer is always ready
+      (`output_ready = 1`). What sustained throughput does this stage deliver?
+    options:
+      - text: >-
+          One transfer every **two** cycles — the stage refuses new data on exactly
+          the cycles it is being drained.
+      - text: One transfer per cycle; the missing term only matters during a stall.
+      - text: >-
+          Nothing transfers at all — the stage locks up after the first item.
+      - text: >-
+          One transfer per cycle, but the data is corrupted because the register is
+          loaded and read on the same edge.
+    answer: 0
+    explanation: >-
+      The naive rule looks only at whether the stage is occupied. On the cycle the
+      consumer takes the data, the register is freed on that very edge — but
+      `output_valid` is still 1 during the cycle, so `input_ready` is low and the load
+      is refused. The stage alternates accept / refuse: a **bubble every other cycle**,
+      50% throughput. Adding the second term makes it bubble-free:
+      `input_ready = !output_valid || output_ready`.
+    ref_text: "Deriving input_ready"
+    ref_link: "#deriving-input_ready"
+
+  - tag: Trace
+    question: >-
+      A stage is holding valid data. During the current cycle the signals are as
+      below. What are `input_ready` and `register_en`, and what must the upstream
+      stage do?
+    code: |
+      output_valid = 1
+      output_ready = 0
+      input_valid  = 1
+    options:
+      - text: >-
+          `input_ready = 0`, `register_en = 0` — no transfer. Upstream must **hold**
+          both its payload and `input_valid` until it sees ready high.
+      - text: >-
+          `input_ready = 1`, `register_en = 1` — the stage loads the new value and the
+          old one is overwritten.
+      - text: >-
+          `input_ready = 0`, `register_en = 1` — the register still captures, but the
+          valid bit does not update.
+      - text: >-
+          `input_ready = 1`, `register_en = 0` — upstream may drop valid and retry on
+          a later cycle.
+    answer: 0
+    explanation: >-
+      `input_ready = !output_valid || output_ready = !1 || 0 = 0`, and
+      `register_en = input_valid && input_ready = 1 && 0 = 0`. Nothing moves, so the
+      stage holds what it has. This is where handshake rule 2 bites: once valid is
+      asserted it stays asserted, with a **stable payload**, until the transfer
+      completes.
+    ref_text: "Handshake Rules"
+    ref_link: "#handshake-rules"
+
+  - tag: Concept
+    question: >-
+      In the reference stage the valid bit and the datapath are clocked with
+      *different* enables. Why not use `register_en` for both?
+    code: |
+      if (input_ready) output_valid_o <= input_valid_i;   // valid  bit
+      if (register_en) data_o         <= data_i;          // datapath
+    options:
+      - text: >-
+          `input_ready` lets an **invalid** cycle shift in so a drained stage can
+          actually become empty; the datapath only has to move on a real transfer,
+          which also saves switching power while bubbles pass through.
+      - text: >-
+          Because `output_valid` needs a reset value and the datapath does not, and an
+          enable cannot be shared between a reset and a non-reset register.
+      - text: >-
+          Because `register_en` arrives too late in the cycle to meet setup on the
+          valid flop.
+      - text: They are logically identical here; it is purely a coding-style choice.
+    answer: 0
+    explanation: >-
+      The valid chain must be able to shift in a **0**. If the valid bit only updated
+      on a transfer, a stage that was drained would never clear itself and the pipeline
+      would lock up. The datapath has no such need — holding a stale value while a
+      bubble passes is harmless, and gating it stops a wide data register from
+      toggling for nothing.
+    ref_text: "Deriving register_en and output_valid"
+    ref_link: "#deriving-register_en-and-output_valid"
+
+  - tag: Protocol
+    question: >-
+      A colleague rewrites a stage's valid output as below, reasoning that "we should
+      only claim valid when someone can actually take it." What goes wrong?
+    code: |
+      assign output_valid_o = data_present & output_ready_i;
+    options:
+      - text: >-
+          It makes valid depend combinationally on ready. Against any consumer whose
+          ready depends on valid, the two sides wait for each other — a combinational
+          loop in synthesis and a deadlock in practice.
+      - text: >-
+          Nothing — it is a common optimisation that saves one flop per stage.
+      - text: It works, but adds one cycle of latency per stage.
+      - text: >-
+          It is legal SystemVerilog but has no synthesizable VHDL equivalent.
+    answer: 0
+    explanation: >-
+      Valid must be a function of the producer's **own state** only. Ready is the side
+      that is allowed to look downstream — that is exactly what
+      `input_ready = !output_valid || output_ready` does. But if valid also waits on
+      ready, each side is waiting for the other: synthesis reports a combinational
+      loop, and nothing ever transfers.
+    ref_text: "Handshake Rules"
+    ref_link: "#handshake-rules"
+
+  - tag: Protocol
+    question: >-
+      Which of these behaviours is **legal** under this ready/valid protocol?
+    options:
+      - text: >-
+          A stage deasserts `input_ready` mid-stall, and derives it combinationally
+          from the downstream `output_ready`.
+      - text: >-
+          A producer asserts valid, then drops it the next cycle because the consumer
+          had not asserted ready yet.
+      - text: >-
+          A producer changes the payload while valid is high and ready is still low.
+      - text: A stage waits until it sees ready high before it asserts valid.
+    answer: 0
+    explanation: >-
+      Ready is the **free** side of the contract: it may toggle at will and may be
+      combinationally derived from the downstream ready. Valid is the **constrained**
+      side: assert it from your own state, then hold it *and* the payload steady until
+      you observe ready high. Options 2 and 3 break that hold rule; option 4 is the
+      valid-depends-on-ready deadlock.
+    ref_text: "Handshake Rules"
+    ref_link: "#handshake-rules"
+
+  - tag: Concept
+    question: >-
+      In a chain of these stages, which registers genuinely require a reset value?
+    options:
+      - text: >-
+          Only the valid bits — no consumer looks at a stage's payload until a valid
+          marker arrives, so the datapath may come out of reset undefined.
+      - text: >-
+          Both, otherwise X values propagate out of the pipeline and corrupt the
+          consumer.
+      - text: >-
+          Only the datapath, so the first result is deterministic.
+      - text: >-
+          Neither, as long as the producer holds `input_valid` low for a few cycles
+          after reset.
+    answer: 0
+    explanation: >-
+      The valid chain is the only state that changes behaviour, so it must start at 0 —
+      otherwise the pipeline claims to hold data it never received. Leaving a wide
+      datapath unreset saves reset routing and area. Plenty of teams reset it anyway,
+      not because the protocol needs it but to keep X out of simulation waveforms; that
+      is a debug decision, not a correctness one.
+    ref_text: "Handshake Rules"
+    ref_link: "#handshake-rules"
+
+  - tag: Timing
+    question: >-
+      A 3-stage pipeline built from these stages runs with a producer that always has
+      data, and a consumer that asserts `output_ready` on **3 out of every 4 cycles**.
+      Once the pipeline has filled, what is the sustained throughput?
+    options:
+      - text: >-
+          0.75 items per cycle — set by the consumer. Adding or removing stages does
+          not change it.
+      - text: 1.0 item per cycle; the three stages absorb the stalls as buffering.
+      - text: 0.25 items per cycle, one for each cycle the consumer refuses.
+      - text: >-
+          0.25 items per cycle — the 0.75 rate is divided across the three stages.
+    answer: 0
+    explanation: >-
+      A bubble-free pipeline just transmits the consumer's acceptance rate **backwards**:
+      the slowest agent on the chain sets the steady-state rate for everyone. Each
+      stage that has to stall drops its `input_ready`, and the producer ends up
+      throttled to the same 3-in-4. Depth buys you items in flight and latency — not
+      rate.
+    ref_text: "The Complete Pipeline"
+    ref_link: "#the-complete-pipeline"
+
+  - tag: Timing
+    question: >-
+      You chain twelve of these stages. Static timing analysis now reports the critical
+      path running from the consumer's ready pin all the way back to the producer.
+      Why, and what is the standard fix?
+    options:
+      - text: >-
+          `input_ready` is combinational and depends on the downstream ready, so it has
+          to ripple through all twelve stages within one cycle. Break the chain every
+          4–8 stages with a skid buffer (register slice).
+      - text: >-
+          The valid chain got too long; register valid an extra time at each stage.
+      - text: >-
+          It is a false path — the ready signal is not really used in that direction,
+          so constrain it with `set_false_path`.
+      - text: >-
+          The pipeline is too shallow for the target frequency; add more stages until
+          the path closes.
+    answer: 0
+    explanation: >-
+      Every stage registers the forward valid and data path, but the backward ready
+      path is a pure combinational OR-chain that grows with depth — eventually eating
+      the exact frequency the pipelining was supposed to buy. A skid buffer registers
+      ready and absorbs the item that is still in flight while the stall travels back.
+      For longer distances, a small FIFO between clusters or credit-based flow control
+      does the same job.
+    ref_text: "Issue: The Long Combinational Ready Path"
+    ref_link: "#issue-the-long-combinational-ready-path"
+
+  - tag: Concept
+    question: >-
+      A skid buffer cuts that backward path by **registering** ready. Why does doing so
+      force the buffer to hold two entries instead of one?
+    options:
+      - text: >-
+          Upstream sees the stall one cycle late, so it can launch one more transfer
+          after the stall was decided; the second slot absorbs that in-flight item.
+      - text: >-
+          Two entries are what doubles the throughput back to one item per cycle.
+      - text: One entry stores the payload and the other stores the valid bit.
+      - text: >-
+          Two entries are needed so the buffer can safely cross into the consumer's
+          clock domain.
+    answer: 0
+    explanation: >-
+      This is precisely why ready **cannot** be registered on its own. The buffer
+      deasserts its registered ready one cycle *early* — as it is about to become full —
+      and keeps the spare slot for the transfer that upstream had already committed to.
+      Two storage slots plus that early-deassert logic is the whole of a skid buffer,
+      and the reason AXI register slices look the way they do.
+    ref_text: "Issue: The Long Combinational Ready Path"
+    ref_link: "#issue-the-long-combinational-ready-path"
