@@ -53,6 +53,10 @@ header:
   background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
 }
 
+.category-header.rtl {
+  background: linear-gradient(135deg, #00BCD4 0%, #00838F 100%);
+}
+
 .category-header.sta {
   background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
 }
@@ -171,6 +175,8 @@ header:
       <div class="category-header {{ category_slug }}">
         {% if category_name == "SystemVerilog" %}
           <img src="/assets/images/1- LevelOfAbstraction.png" alt="{{ category_name }}" class="category-image">
+        {% elsif category_name == "RTL" %}
+          <img src="/assets/images/22- Pipeline Cover.png" alt="{{ category_name }}" class="category-image">
         {% elsif category_name == "STA" %}
           <img src="/assets/images/2- Design flow.png" alt="{{ category_name }}" class="category-image">
         {% elsif category_name == "Book Review" %}
@@ -181,6 +187,8 @@ header:
           <div class="category-icon">
             {% if category_name == "SystemVerilog" %}
               <i class="fas fa-microchip"></i>
+            {% elsif category_name == "RTL" %}
+              <i class="fas fa-wave-square"></i>
             {% elsif category_name == "STA" %}
               <i class="fas fa-clock"></i>
             {% elsif category_name == "Book Review" %}
@@ -200,6 +208,8 @@ header:
         <div class="category-description">
           {% if category_name == "SystemVerilog" %}
             Digital circuit design, FPGA and ASIC development, RTL coding, and SystemVerilog language fundamentals.
+          {% elsif category_name == "RTL" %}
+            Register Transfer Level design in practice: pipelines and handshakes, microarchitecture, and FPGA/ASIC design toolchains and workflows.
           {% elsif category_name == "STA" %}
             Static Timing Analysis, timing constraints, clock domain crossing, and timing closure techniques.
           {% elsif category_name == "Book Review" %}
@@ -292,7 +302,7 @@ header:
   
   <section id="{{ category_slug }}" style="margin-top: 4em; padding-top: 2em; border-top: 2px solid #f0f0f0;">
     <h2 style="color: #333; margin-bottom: 1.5em;">
-      <i class="fas fa-{% if category_name == 'SystemVerilog' %}microchip{% elsif category_name == 'STA' %}clock{% elsif category_name == 'Book Review' %}book{% else %}folder{% endif %}" style="margin-right: 0.5em; color: #007acc;"></i>
+      <i class="fas fa-{% if category_name == 'SystemVerilog' %}microchip{% elsif category_name == 'RTL' %}wave-square{% elsif category_name == 'STA' %}clock{% elsif category_name == 'Book Review' %}book{% elsif category_name == 'UVM' %}cogs{% else %}folder{% endif %}" style="margin-right: 0.5em; color: #007acc;"></i>
       {{ category_name }} Posts
     </h2>
     

@@ -169,6 +169,9 @@ collections:
   systemverilog:
     output: true
     permalink: /:collection/:path/
+  RTL:
+    output: true
+    permalink: /:collection/:path/
   sta:
     output: true
     permalink: /:collection/:path/
