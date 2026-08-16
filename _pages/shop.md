@@ -8,7 +8,7 @@ Welcome to the AICLAB Resources page.
 ## Udemy Course
 
 - [The Complete SystemVerilog For Digital Design and Synthesis](https://www.udemy.com/course/systemverilog/?referralCode=34525774A6A4CC9B8A24)
-  - Coupon Code: HELLODIGITAL4
+  - Coupon Code: HELLODIGITAL5
 
 
 ## PDF
