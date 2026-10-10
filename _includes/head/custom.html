@@ -93,6 +93,29 @@
 }
 </style>
 
+{% if page.title %}
+<style media="print">
+/* PDF export: A4 pages with the post title, link and page number in the footer.
+   Chrome draws @page margin boxes since version 131; see _posts/README.md. */
+@page {
+  size: A4;
+  margin: 15mm 15mm 18mm;
+
+  @bottom-left {
+    content: "{{ page.title | replace: '"', '\"' }} · {{ page.url | absolute_url | remove: 'https://' }}";
+    font: 8pt -apple-system, BlinkMacSystemFont, "Roboto", "Segoe UI", "Helvetica Neue", "Lucida Grande", Arial, sans-serif;
+    color: #7a8288;
+  }
+
+  @bottom-right {
+    content: counter(page) " / " counter(pages);
+    font: 8pt -apple-system, BlinkMacSystemFont, "Roboto", "Segoe UI", "Helvetica Neue", "Lucida Grande", Arial, sans-serif;
+    color: #7a8288;
+  }
+}
+</style>
+{% endif %}
+
 <!-- Alternative Analytics Options (uncomment the one you want to use) -->
 
 <!-- Option 1: Plausible Analytics (Privacy-focused) -->

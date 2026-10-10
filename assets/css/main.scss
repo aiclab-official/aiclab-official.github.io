@@ -79,3 +79,41 @@
     max-height: 120px;
   }
 }
+
+/* Print and PDF export (see _posts/README.md) */
+@media print {
+  /* Links stay clickable in a PDF, so don't print each URL after its link */
+  a[href^='http://']:after,
+  a[href^='https://']:after,
+  a[href^='ftp://']:after {
+    content: none;
+  }
+
+  /* Show which text is a link (the theme prints links black) */
+  .page__content a,
+  .page__content a:visited {
+    color: $link-color;
+  }
+
+  /* The theme keeps each list on one page, which leaves big gaps before long
+     lists. Let lists break between items; each item still stays whole unless
+     it holds a nested list, like the table of contents. */
+  ul,
+  ol,
+  li:has(> ul),
+  li:has(> ol) {
+    page-break-inside: auto;
+    break-inside: auto;
+  }
+
+  /* Keep bold one-line labels such as "Read when needed" with what follows */
+  p:has(> strong:only-child) {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  /* Slightly tighter lines than on screen, to save pages */
+  .layout--single .page__content {
+    line-height: 1.55;
+  }
+}

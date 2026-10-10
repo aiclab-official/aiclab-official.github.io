@@ -1,0 +1,19 @@
+{% comment %}
+  Shows a "Download as PDF" button for a PDF export of the post.
+
+  Usage:
+    {% include pdf-download.html src="/assets/pdf/learn-fpga.pdf" %}
+
+  Make the PDF with _scripts/post-pdf.sh (see _posts/README.md). The button
+  only appears once the file exists, and the theme's no-print class keeps it
+  out of the PDF itself.
+{% endcomment %}
+
+{% assign pdf_file = site.static_files | where: "path", include.src | first %}
+{% if pdf_file %}
+<p class="no-print">
+  <a href="{{ include.src | relative_url }}" class="btn btn--primary">
+    <i class="fas fa-fw fa-file-pdf" aria-hidden="true"></i> Download as PDF
+  </a>
+</p>
+{% endif %}
