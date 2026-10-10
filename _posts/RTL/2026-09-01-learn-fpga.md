@@ -17,28 +17,50 @@ classes: wide
 
 ![Learn FPGA Development](/assets/images/23-Cover.png)
 
-Most of what you need to learn FPGA design on AMD devices is free: official courses and workshops, videos, hands-on tutorials, and a large library of user guides and data sheets. The hard part is knowing where each piece lives and which document to open first. This post collects them in one place.
+Most of what you need to learn FPGA design on Xilinx (AMD) devices is free: official courses and workshops, videos, hands-on tutorials, and a large library of user guides and data sheets. The hard part is knowing where each piece lives and which document to open first. This post collects them in one place.
 
-Part 1 covers training, videos, and tutorials. Part 2 lists the AMD documents, grouped by topic and device family, and ends with a suggested reading order. Xilinx is now part of AMD, so all former Xilinx material lives on AMD sites today. I checked every link on 27 September 2026.
+Part 1 covers training, videos, and tutorials. Part 2 lists the AMD documents, grouped by topic and device family, and ends with a suggested reading order. Xilinx is now part of AMD, so all former Xilinx material lives on AMD sites today. I checked every link on 6 October 2026.
 
 ## Table of Contents
 
 - [Table of Contents](#table-of-contents)
 - [Part 1: Training and Videos](#part-1-training-and-videos)
   - [Official AMD Training](#official-amd-training)
+    - [AMD Customer Training](#amd-customer-training)
+    - [AMD University Program](#amd-university-program)
   - [Free Workshops and Webinars from AMD Training Partners](#free-workshops-and-webinars-from-amd-training-partners)
+    - [BLT](#blt)
+    - [Doulos](#doulos)
+    - [PLC2](#plc2)
   - [Videos](#videos)
   - [Hands-On Tutorials](#hands-on-tutorials)
   - [AMD Support Articles](#amd-support-articles)
+    - [Design and Debug Techniques Blog](#design-and-debug-techniques-blog)
   - [Community Resources](#community-resources)
 - [Part 2: Documents](#part-2-documents)
   - [How to Find Documents](#how-to-find-documents)
   - [Start Here](#start-here)
   - [Vivado Tool Flow](#vivado-tool-flow)
+  - [Power Estimation and Analysis](#power-estimation-and-analysis)
   - [IP and Interfaces](#ip-and-interfaces)
+    - [Using and Creating IP](#using-and-creating-ip)
+    - [AXI](#axi)
   - [IP Product Guides](#ip-product-guides)
+    - [Clocking and On-Chip Memory](#clocking-and-on-chip-memory)
+    - [Debug](#debug)
+    - [AXI Infrastructure and DMA](#axi-infrastructure-and-dma)
+    - [Processors](#processors)
+    - [Memory Controllers](#memory-controllers)
+    - [PCI Express](#pci-express)
+    - [Ethernet](#ethernet)
   - [Device Architecture](#device-architecture)
+    - [7 Series](#7-series)
+    - [UltraScale and UltraScale+](#ultrascale-and-ultrascale)
+    - [Versal](#versal)
   - [SoCs](#socs)
+    - [Zynq 7000 SoC](#zynq-7000-soc)
+    - [Zynq UltraScale+ MPSoC and RFSoC](#zynq-ultrascale-mpsoc-and-rfsoc)
+    - [Versal Adaptive SoC](#versal-adaptive-soc)
   - [Embedded Software](#embedded-software)
   - [HLS and Libraries](#hls-and-libraries)
   - [Background Papers](#background-papers)
@@ -52,7 +74,7 @@ Part 1 covers training, videos, and tutorials. Part 2 lists the AMD documents, g
 
 ![AMD On-Demand Customer Training page](/assets/images/RTL/AMD-On-Demand-Customer-Training.png)
 
-AMD offers official training for Vivado, Vitis, Versal, Zynq, and Kria in two places. The On-Demand Customer Training page lists self-paced courses: a few introductory ones are free, and the full curriculum (the Vivado series, HDL, HLS, Versal, and embedded Linux) is paid. The Customer Training Center catalog also lists free, live virtual workshops that AMD sponsors and its regional training partners (such as BLT, Doulos, HDLab, and PLC2) deliver. The topics change during the year, so check the catalog for the current schedule.
+AMD offers official training for Vivado, Vitis, Versal, Zynq, and Kria in two places. The On-Demand Customer Training page lists self-paced courses: a few introductory ones are free, and the full curriculum is paid. The paid courses include the Designing FPGAs Using the Vivado Design Suite series, UltraFast Design Methodology, Design Closure Techniques, and courses on HLS, Versal, and embedded Linux. The Customer Training Center catalog also lists free, live virtual workshops that AMD sponsors and its regional training partners (such as BLT, Doulos, and PLC2) deliver. The topics change during the year, so check the catalog for the current schedule.
 
 - **[On-Demand Customer Training](https://www.amd.com/en/training/customer/adaptive-computing/customer-training.html)** Self-paced courses. Partly free.
 - **[Free AMD workshops](https://learningcatalog-amd.netexam.com/Search?searchText=free+workshop)** Current free workshops in the Customer Training Center. Free, registration required.
@@ -65,10 +87,11 @@ The AMD University Program (AUP) supports universities with hardware and softwar
 
 - **[AMD University Program](https://www.amd.com/en/corporate/university-program.html)** Program overview and membership. Free for eligible faculty and researchers.
 - **[Adaptive and Embedded Computing Training](https://www.amd.com/en/corporate/university-program/adaptive-computing-training.html)** Public tutorials and labs. Free.
+- **[Vivado FPGA Design Flow labs](https://xilinx.github.io/xup_fpga_vivado_flow/)** AUP's six-lab Vivado workshop: synthesis, implementation, I/O planning, simulation, static timing analysis, and debug, written for Vivado 2021.2 and the PYNQ-Z2 and Boolean boards. Free.
 
 ### Free Workshops and Webinars from AMD Training Partners
 
-AMD Authorized Training Providers sell full courses, but they also run free events, many of them sponsored by AMD.
+AMD Authorized Training Providers sell full courses, but they also run free events, many of them sponsored by AMD. AMD's [Authorized Training Providers](https://www.amd.com/en/training/customer/adaptive-computing/atp.html) page lists them by region; the three below run regular free events.
 
 #### BLT
 
@@ -89,6 +112,13 @@ Doulos is a training company for hardware design and verification languages and 
 - **[Doulos webinars](https://www.doulos.com/events/webinars/)** Live and on-demand webinars. Free.
 - **[Doulos KnowHow](https://www.doulos.com/knowhow/)** Articles, tutorials, and reference guides. Free.
 
+#### PLC2
+
+PLC2 (Programmable Logic Competence Centre) is an AMD Authorized Training Provider based in Germany that serves Europe. Besides its paid courses, it runs free one-hour webinars, most of them available on demand (recent topics include FPGA timing constraints and clock domain crossing), and free one-day technical seminars held on site.
+
+- **[PLC2 webinars](https://plc2.com/format/webinar/)** One-hour technical webinars, live and on demand. Free.
+- **[PLC2 seminars](https://plc2.com/format/seminar/)** One-day technical seminars. Free, registration required.
+
 ### Videos
 
 AMD no longer updates the old Xilinx YouTube channel. The official tool videos are now playlists on the main AMD channel.
@@ -96,6 +126,7 @@ AMD no longer updates the old Xilinx YouTube channel. The official tool videos a
 - **[Vivado Design Suite playlist](https://www.youtube.com/playlist?list=PLx15eYqzJifdm1uagbJVEr5h7UV53ZAvM)** Short official walkthroughs and feature demos for Vivado.
 - **[Vitis Software Developer Tools playlist](https://www.youtube.com/playlist?list=PLx15eYqzJiffFbxgqz7qj_dxUnxJbDxnf)** Short official walkthroughs and feature demos for the Vitis tools.
 - **[More AMD playlists](https://www.youtube.com/@AMD/playlists)** Other adaptive computing playlists on the AMD channel: [Vivado for Versal](https://www.youtube.com/playlist?list=PLx15eYqzJifdQD_uhlT-1KvyBUGVnydGW), [Vivado for Spartan UltraScale+](https://www.youtube.com/playlist?list=PLx15eYqzJifcxVQP7i2NloUmW1auc_gTy), [AMD Embedded Development Framework](https://www.youtube.com/playlist?list=PLx15eYqzJifeEg2sICp7xP_H3E8OxxyqV), and [Vitis Tools for Versal AI Engines](https://www.youtube.com/playlist?list=PLx15eYqzJiffZIxcIewPxNSmwrdoXsq2B).
+- **[Vivado QuickTake: Introduction to Clock Constraints](https://www.youtube.com/watch?v=WMZQemJpPZQ)** A short AMD video on defining clocks in XDC. Two related QuickTake videos cover [Clock Group Constraints](https://www.youtube.com/watch?v=-_vsPVP1scc) and [Using the XDC Constraint Editor](https://www.youtube.com/watch?v=ohv14ZwIWMA). Good companions to UG903.
 - **[Nandland on YouTube](https://www.youtube.com/@Nandland)** Russell Merrick's beginner-friendly videos on core FPGA concepts such as clocks, state machines, and metastability, in both VHDL and Verilog. His website, [nandland.com](https://nandland.com/), has matching written tutorials.
 
 The BLT and Doulos webinars listed above are also recorded and available on demand.
@@ -149,31 +180,44 @@ AMD publishes a user guide (UG), product guide (PG), data sheet (DS), white pape
 These apply to every device family.
 
 - **[UG910](https://docs.amd.com/r/en-US/ug910-vivado-getting-started)** Vivado Design Suite User Guide: Getting Started. A short introduction to installing, licensing, and launching Vivado, and to finding the rest of the documentation.
+- **[UG973](https://docs.amd.com/r/en-US/ug973-vivado-release-notes-install-license)** Vivado Design Suite User Guide: Release Notes, Installation, and Licensing. What is new in each release, supported operating systems and devices, system requirements, installation, and license setup.
 - **[UG888](https://docs.amd.com/r/en-US/ug888-vivado-design-flows-overview-tutorial)** Vivado Design Suite Tutorial: Design Flows Overview. A hands-on tutorial that takes a small design through the full Vivado flow in both project and non-project mode.
-- **[UG949](https://docs.amd.com/r/en-US/ug949-vivado-design-methodology)** UltraFast Design Methodology Guide for FPGAs and SoCs. AMD's recommended practices from board and device planning through RTL coding, clocking, resets, constraints, and timing closure. Read it before the individual Vivado user guides.
+- **[UG949](https://docs.amd.com/r/en-US/ug949-vivado-design-methodology)** UltraFast Design Methodology Guide for FPGAs and SoCs. AMD's recommended practices from board and device planning through RTL coding, clocking, resets, constraints, and timing closure. Read it before the individual Vivado user guides. For writing XDC, start with its [four-step method](https://docs.amd.com/r/en-US/ug949-vivado-design-methodology/Defining-Timing-Constraints-in-Four-Steps): clocks, then input and output delays, then clock groups and CDC constraints, then timing exceptions. For timing closure, start with [Baselining the Design](https://docs.amd.com/r/en-US/ug949-vivado-design-methodology/Baselining-the-Design).
 - **[UG1292](https://docs.amd.com/v/u/2025.1-English/ug1292-ultrafast-timing-closure-quick-reference)** UltraFast Design Methodology Timing Closure Quick Reference Guide. A short, printable summary of the UG949 timing closure flow: initial design checks, baselining, and resolving setup and hold violations, congestion, and clock skew.
 - **[WP272](https://docs.amd.com/v/u/en-US/wp272)** Get Smart About Reset: Think Local, Not Global. A 2008 white paper on why a global reset is rarely needed in FPGA designs, and how resetting only the logic that needs it saves routing and helps timing. The device examples are old; the reasoning still applies.
 
 ### Vivado Tool Flow
 
-- **[UG892](https://docs.amd.com/r/en-US/ug892-vivado-design-flows-overview)** Vivado Design Suite User Guide: Design Flows Overview. The Vivado flow from RTL to bitstream, and the difference between project mode and non-project (scripted) mode.
-- **[UG900](https://docs.amd.com/r/en-US/ug900-vivado-logic-simulation)** Vivado Design Suite User Guide: Logic Simulation. The Vivado simulator (XSim), simulating designs that contain IP, compiling simulation libraries for third-party simulators, and running simulation in batch mode.
+Most of these user guides have a companion tutorial, a separate UG that walks through the same topics on a small example design. Where one exists, it is linked at the end of the entry.
+
+- **[UG892](https://docs.amd.com/r/en-US/ug892-vivado-design-flows-overview)** Vivado Design Suite User Guide: Design Flows Overview. The Vivado flow from RTL to bitstream, and the difference between project mode and non-project (scripted) mode. Companion tutorial: UG888, listed in Start Here.
+- **[UG900](https://docs.amd.com/r/en-US/ug900-vivado-logic-simulation)** Vivado Design Suite User Guide: Logic Simulation. The Vivado simulator (XSim), simulating designs that contain IP, compiling simulation libraries for third-party simulators, and running simulation in batch mode. Companion tutorial: [UG937](https://docs.amd.com/r/en-US/ug937-vivado-design-suite-simulation-tutorial).
 - **[UG901](https://docs.amd.com/r/en-US/ug901-vivado-synthesis)** Vivado Design Suite User Guide: Synthesis. Synthesis settings, supported HDL constructs, coding templates for inferring RAM, ROM, DSP blocks, and shift registers, and synthesis attributes.
-- **[UG903](https://docs.amd.com/r/en-US/ug903-vivado-using-constraints)** Vivado Design Suite User Guide: Using Constraints. XDC constraints: primary and generated clocks, input and output delays, timing exceptions, and physical constraints such as pin locations.
+- **[UG903](https://docs.amd.com/r/en-US/ug903-vivado-using-constraints)** Vivado Design Suite User Guide: Using Constraints. XDC constraints: primary and generated clocks, input and output delays, timing exceptions, and physical constraints such as pin locations. It also covers the Timing Constraints Wizard, which finds missing clock, I/O, and clock domain crossing constraints. Companion tutorial: [UG945](https://docs.amd.com/r/en-US/ug945-vivado-using-constraints-tutorial).
 - **[UG899](https://docs.amd.com/r/en-US/ug899-vivado-io-clock-planning)** Vivado Design Suite User Guide: I/O and Clock Planning. Pin assignment, I/O standards and banking rules, and placement of clock resources, for existing boards and when working with a PCB designer.
-- **[UG904](https://docs.amd.com/r/en-US/ug904-vivado-implementation)** Vivado Design Suite User Guide: Implementation. The opt_design, place_design, phys_opt_design, and route_design steps, implementation strategies, and incremental implementation.
-- **[UG906](https://docs.amd.com/r/en-US/ug906-vivado-design-analysis)** Vivado Design Suite User Guide: Design Analysis and Closure Techniques. How to read timing, utilization, and QoR reports, analyze failing paths, and close timing.
-- **[UG908](https://docs.amd.com/r/en-US/ug908-vivado-programming-debugging)** Vivado Design Suite User Guide: Programming and Debugging. Programming devices and configuration flash from the Hardware Manager, and in-system debug with ILA, VIO, and other debug cores over JTAG.
+- **[UG904](https://docs.amd.com/r/en-US/ug904-vivado-implementation)** Vivado Design Suite User Guide: Implementation. The opt_design, place_design, phys_opt_design, and route_design steps, implementation strategies, and incremental implementation. Companion tutorial: [UG986](https://docs.amd.com/r/en-US/ug986-vivado-tutorial-implementation).
+- **[UG906](https://docs.amd.com/r/en-US/ug906-vivado-design-analysis)** Vivado Design Suite User Guide: Design Analysis and Closure Techniques. How to read timing, utilization, and QoR reports, analyze failing paths, and close timing. Companion tutorial: [UG938](https://docs.amd.com/r/en-US/ug938-vivado-design-analysis-closure-tutorial).
+- **[UG908](https://docs.amd.com/r/en-US/ug908-vivado-programming-debugging)** Vivado Design Suite User Guide: Programming and Debugging. Programming devices and configuration flash from the Hardware Manager, in-system debug with ILA, VIO, and other debug cores over JTAG, and IBERT for testing transceiver links. Companion tutorial: [UG936](https://docs.amd.com/r/en-US/ug936-vivado-tutorial-programming-debugging).
 - **[UG894](https://docs.amd.com/r/en-US/ug894-vivado-tcl-scripting)** Vivado Design Suite User Guide: Using Tcl Scripting. Batch mode, querying and modifying the in-memory design, and writing reusable scripts. This is the basis for automated and CI builds.
 - **[UG835](https://docs.amd.com/r/en-US/ug835-vivado-tcl-commands)** Vivado Design Suite Tcl Command Reference Guide. Syntax, options, and examples for every Vivado Tcl command. Use it as a lookup reference, not a book to read through.
+- **[UG912](https://docs.amd.com/r/en-US/ug912-vivado-properties)** Vivado Design Suite Properties Reference Guide. The properties of every Vivado object (cells, nets, pins, ports, clocks) that you query and set from Tcl and XDC. A lookup reference, like UG835.
+- **[UG909](https://docs.amd.com/r/en-US/ug909-vivado-partial-reconfiguration)** Vivado Design Suite User Guide: Dynamic Function eXchange. Reconfiguring part of the device while the rest keeps running, formerly called partial reconfiguration. An advanced topic; read it when a project needs it.
+
+### Power Estimation and Analysis
+
+Estimate power early to size the power supplies and cooling, then check it against the real design in Vivado.
+
+- **[UG1556](https://docs.amd.com/r/en-US/ug1556-power-design-manager)** Power Design Manager User Guide. Power Design Manager (PDM) is AMD's power and thermal estimator for UltraScale+ and Versal devices, covering the programmable logic, processing system, transceivers, memory interfaces, and AI Engines.
+- **[UG440](https://docs.amd.com/r/en-US/ug440-xilinx-power-estimator)** Xilinx Power Estimator User Guide. XPE is the spreadsheet-based estimator for use before a design exists. AMD now points to PDM for UltraScale+ and Versal, so use XPE for 7 series, Zynq 7000, and UltraScale devices.
+- **[UG907](https://docs.amd.com/r/en-US/ug907-vivado-power-analysis-optimization)** Vivado Design Suite User Guide: Power Analysis and Optimization. Power analysis on the synthesized or implemented design, vectorless or driven by simulation activity (SAIF), and the power optimization options in Vivado.
 
 ### IP and Interfaces
 
 #### Using and Creating IP
 
-- **[UG896](https://docs.amd.com/r/en-US/ug896-vivado-ip)** Vivado Design Suite User Guide: Designing with IP. The IP catalog, customizing IP, generating output products, out-of-context synthesis, simulating IP, and upgrading IP between Vivado releases.
-- **[UG1118](https://docs.amd.com/r/en-US/ug1118-vivado-creating-packaging-custom-ip)** Vivado Design Suite User Guide: Creating and Packaging Custom IP. How to package your own RTL as reusable IP with the IP Packager, including bus interfaces, parameters, and custom IP repositories.
-- **[UG994](https://docs.amd.com/r/en-US/ug994-vivado-ip-subsystems)** Vivado Design Suite User Guide: Designing IP Subsystems Using IP Integrator. Building block designs: connection automation, address maps, parameter propagation, and the generated HDL wrapper. This is where a Zynq processing system gets connected to your logic.
+- **[UG896](https://docs.amd.com/r/en-US/ug896-vivado-ip)** Vivado Design Suite User Guide: Designing with IP. The IP catalog, customizing IP, generating output products, out-of-context synthesis, simulating IP, and upgrading IP between Vivado releases. Companion tutorial: [UG939](https://docs.amd.com/r/en-US/ug939-vivado-designing-with-ip-tutorial).
+- **[UG1118](https://docs.amd.com/r/en-US/ug1118-vivado-creating-packaging-custom-ip)** Vivado Design Suite User Guide: Creating and Packaging Custom IP. How to package your own RTL as reusable IP with the IP Packager, including bus interfaces, parameters, and custom IP repositories. Companion tutorial: [UG1119](https://docs.amd.com/r/en-US/ug1119-vivado-creating-packaging-ip-tutorial).
+- **[UG994](https://docs.amd.com/r/en-US/ug994-vivado-ip-subsystems)** Vivado Design Suite User Guide: Designing IP Subsystems Using IP Integrator. Building block designs: connection automation, address maps, parameter propagation, and the generated HDL wrapper. This is where a Zynq processing system gets connected to your logic. Companion tutorial: [UG995](https://docs.amd.com/r/en-US/ug995-vivado-ip-subsystems-tutorial).
 
 #### AXI
 
@@ -418,11 +462,11 @@ The overview and DC and AC data sheets are listed under [Versal](#versal) in the
 
 ### Suggested Reading Order
 
-1. UG910 and UG888: install the tools and take one small design through the full flow.
+1. UG910 and UG973 to install the tools, then UG888 to take one small design through the full flow.
 2. UG949 (the RTL coding, clocking, and reset chapters) and WP272.
 3. The CLB, clocking, and memory guides for your family, for example UG474, UG472, and UG473 for 7 series.
-4. UG903 as soon as you write your first constraints; UG906 and UG1292 when timing fails.
+4. UG903, its tutorial UG945, and the UG949 four-step method as soon as you write your first constraints; UG906 and UG1292 when timing fails.
 5. Before your first block design: UG994, UG1037, and the Arm AXI specification. On a Zynq board, add your family's TRM and UG1400.
 6. Everything else as you need it.
 
-I checked every link in this post on 27 September 2026. AMD moves documents from time to time; if a link breaks, search [docs.amd.com](https://docs.amd.com/) for the document number. For more tutorials, see [AICLAB Resources](https://aic-lab.com/resources/).
+I checked every link in this post on 6 October 2026. AMD moves documents from time to time; if a link breaks, search [docs.amd.com](https://docs.amd.com/) for the document number. For more tutorials, see [AICLAB Resources](https://aic-lab.com/resources/).
