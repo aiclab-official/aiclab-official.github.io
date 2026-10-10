@@ -28,7 +28,7 @@ fi
 mkdir -p "$(dirname "$out")"
 rm -f "$out"
 "$chrome" --headless --no-pdf-header-footer --generate-pdf-document-outline \
-  --virtual-time-budget=15000 --print-to-pdf="$out" "$url"
+  --virtual-time-budget=15000 --log-level=3 --print-to-pdf="$out" "$url"
 
 if [ ! -s "$out" ]; then
   echo "Chrome did not write $out" >&2
