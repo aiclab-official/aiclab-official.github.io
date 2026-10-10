@@ -21,6 +21,8 @@ Most of what you need to learn FPGA design on Xilinx (AMD) devices is free: offi
 
 Part 1 covers training, videos, and tutorials. Part 2 lists the AMD documents, grouped by topic and device family, and ends with a suggested reading order. Xilinx is now part of AMD, so all former Xilinx material lives on AMD sites today. I checked every link on October 2026.
 
+{% include pdf-download.html src="/assets/pdf/learn-fpga.pdf" %}
+
 ## Table of Contents
 
 - [Table of Contents](#table-of-contents)
