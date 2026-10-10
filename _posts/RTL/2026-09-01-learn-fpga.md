@@ -11,15 +11,15 @@ tags:
   - Vitis
 excerpt: "A curated reference of free AMD training, videos, and documents for learning FPGA and adaptive SoC design with Vivado and Vitis, plus a short list of community resources."
 header:
-  teaser: /assets/images/23-Cover.png
+  teaser: /assets/images/23-Learn-FPGA-Cover.png
 classes: wide
 ---
 
-![Learn FPGA Development](/assets/images/23-Cover.png)
+![Learn FPGA Development](/assets/images/23-Learn-FPGA-Cover.png)
 
-Most of what you need to learn FPGA design on Xilinx (AMD) devices is free: official courses and workshops, videos, hands-on tutorials, and a large library of user guides and data sheets. The hard part is knowing where each piece lives and which document to open first. This post collects them in one place.
+Most of what you need to learn FPGA design on Xilinx (AMD) devices is free: official courses and workshops, videos, hands-on tutorials, and a large library of user guides and data sheets. The hard part is where to find each document and which document to open first. This post collects them in one place.
 
-Part 1 covers training, videos, and tutorials. Part 2 lists the AMD documents, grouped by topic and device family, and ends with a suggested reading order. Xilinx is now part of AMD, so all former Xilinx material lives on AMD sites today. I checked every link on 6 October 2026.
+Part 1 covers training, videos, and tutorials. Part 2 lists the AMD documents, grouped by topic and device family, and ends with a suggested reading order. Xilinx is now part of AMD, so all former Xilinx material lives on AMD sites today. I checked every link on October 2026.
 
 ## Table of Contents
 
@@ -160,14 +160,17 @@ These sites are run by independent engineers and are free to read.
 
 ## Part 2: Documents
 
-AMD publishes a user guide (UG), product guide (PG), data sheet (DS), white paper (WP), or architecture manual (AM) for nearly every tool, IP core, and device. The lists below group the ones worth knowing by topic. Start with How to Find Documents and Start Here; in the device and SoC sections, read only the set for your family.
+AMD publishes a user guide (UG), product guide (PG), data sheet (DS), white paper (WP), or architecture manual (AM) for nearly every tool, IP core, and device. The lists below group the ones worth knowing by topic. Start with How to Find Documents and Start Here. In the device and SoC sections, read only the set for your family.
 
 ### How to Find Documents
 
 - **[docs.amd.com](https://docs.amd.com/)** AMD's documentation portal. Search by document number (for example UG949) or by title, and filter by product, document type, and tool version. The links in this post have no version number in them, so they open the latest release. Newer documents open as HTML pages (`/r/en-US/...`) and older ones as PDFs (`/v/u/en-US/...`); if you build a link yourself and get a 404, try the other form.
 - **[UG1793](https://docs.amd.com/v/u/en-US/ug1793-vivado-design-suite)** Vivado Design Suite Landing Page. AMD's index of every Vivado document for the current release.
+![Vivado Design Suite Landing Page](/assets/images/RTL/Vivado Landing Page.png)
 - **[UG1416](https://docs.amd.com/v/u/en-US/ug1416-vitis-documentation)** Vitis Unified Software Platform Documentation Landing Page. The same index for the Vitis tools.
+![Vitis Unified Software Platform Documentation](/assets/images/RTL/Vitis Documentation.png)
 - **[UG1776](https://docs.amd.com/v/u/en-US/ug1776-adaptive-computing-design-hubs-lp)** Adaptive Computing Design Hubs Landing Page. Design Hubs group the documents, videos, and support articles for one task, such as timing closure, IP integration, or embedded development.
+![AMD Adaptive Computing Design Hubs Landing Page](/assets/images/RTL/Adaptive Computing Landing Page.png)
 - **[UG968](https://docs.amd.com/r/en-US/Xilinx-Documentation-Navigator-User-Guide)** Xilinx Documentation Navigator User Guide. Documentation Navigator (DocNav) is a free desktop application for browsing, filtering, and downloading AMD documents for offline use. You can still install it with the AMD Unified Installer, but docs.amd.com is the main option when you are online.
 - **[Adaptive Support Knowledge Base](https://adaptivesupport.amd.com/s/knowledge-base?language=en_US)** Articles on known issues, design advisories, workarounds, and release notes. These were called Answer Records on the old Xilinx site.
 - **[Adaptive Support Community Forums](https://adaptivesupport.amd.com/s/topiccatalog?language=en_US)** Q&A forums for Vivado, Vitis, IP, embedded Linux, and devices, answered by AMD engineers and experienced users. Reading is open; posting needs a free AMD account.
@@ -179,12 +182,12 @@ AMD publishes a user guide (UG), product guide (PG), data sheet (DS), white pape
 
 These apply to every device family.
 
-- **[UG910](https://docs.amd.com/r/en-US/ug910-vivado-getting-started)** Vivado Design Suite User Guide: Getting Started. A short introduction to installing, licensing, and launching Vivado, and to finding the rest of the documentation.
+- **[UG910](https://docs.amd.com/r/en-US/ug910-vivado-getting-started)** Vivado Design Suite User Guide: Getting Started. A short introduction to installing, licensing, and launching Vivado, also including short videos, and links to additional resources.
 - **[UG973](https://docs.amd.com/r/en-US/ug973-vivado-release-notes-install-license)** Vivado Design Suite User Guide: Release Notes, Installation, and Licensing. What is new in each release, supported operating systems and devices, system requirements, installation, and license setup.
 - **[UG888](https://docs.amd.com/r/en-US/ug888-vivado-design-flows-overview-tutorial)** Vivado Design Suite Tutorial: Design Flows Overview. A hands-on tutorial that takes a small design through the full Vivado flow in both project and non-project mode.
 - **[UG949](https://docs.amd.com/r/en-US/ug949-vivado-design-methodology)** UltraFast Design Methodology Guide for FPGAs and SoCs. AMD's recommended practices from board and device planning through RTL coding, clocking, resets, constraints, and timing closure. Read it before the individual Vivado user guides. For writing XDC, start with its [four-step method](https://docs.amd.com/r/en-US/ug949-vivado-design-methodology/Defining-Timing-Constraints-in-Four-Steps): clocks, then input and output delays, then clock groups and CDC constraints, then timing exceptions. For timing closure, start with [Baselining the Design](https://docs.amd.com/r/en-US/ug949-vivado-design-methodology/Baselining-the-Design).
 - **[UG1292](https://docs.amd.com/v/u/2025.1-English/ug1292-ultrafast-timing-closure-quick-reference)** UltraFast Design Methodology Timing Closure Quick Reference Guide. A short, printable summary of the UG949 timing closure flow: initial design checks, baselining, and resolving setup and hold violations, congestion, and clock skew.
-- **[WP272](https://docs.amd.com/v/u/en-US/wp272)** Get Smart About Reset: Think Local, Not Global. A 2008 white paper on why a global reset is rarely needed in FPGA designs, and how resetting only the logic that needs it saves routing and helps timing. The device examples are old; the reasoning still applies.
+- **[WP272](https://docs.amd.com/v/u/en-US/wp272)** Get Smart About Reset: Think Local, Not Global. A 2008 white paper on why a global reset is rarely needed in FPGA designs, and how resetting only the logic that needs it saves routing and helps timing. The device examples are old, but the reasoning still applies.
 
 ### Vivado Tool Flow
 
@@ -199,7 +202,7 @@ Most of these user guides have a companion tutorial, a separate UG that walks th
 - **[UG906](https://docs.amd.com/r/en-US/ug906-vivado-design-analysis)** Vivado Design Suite User Guide: Design Analysis and Closure Techniques. How to read timing, utilization, and QoR reports, analyze failing paths, and close timing. Companion tutorial: [UG938](https://docs.amd.com/r/en-US/ug938-vivado-design-analysis-closure-tutorial).
 - **[UG908](https://docs.amd.com/r/en-US/ug908-vivado-programming-debugging)** Vivado Design Suite User Guide: Programming and Debugging. Programming devices and configuration flash from the Hardware Manager, in-system debug with ILA, VIO, and other debug cores over JTAG, and IBERT for testing transceiver links. Companion tutorial: [UG936](https://docs.amd.com/r/en-US/ug936-vivado-tutorial-programming-debugging).
 - **[UG894](https://docs.amd.com/r/en-US/ug894-vivado-tcl-scripting)** Vivado Design Suite User Guide: Using Tcl Scripting. Batch mode, querying and modifying the in-memory design, and writing reusable scripts. This is the basis for automated and CI builds.
-- **[UG835](https://docs.amd.com/r/en-US/ug835-vivado-tcl-commands)** Vivado Design Suite Tcl Command Reference Guide. Syntax, options, and examples for every Vivado Tcl command. Use it as a lookup reference, not a book to read through.
+- **[UG835](https://docs.amd.com/r/en-US/ug835-vivado-tcl-commands)** Vivado Design Suite Tcl Command Reference Guide. Syntax, options, and examples for every Vivado Tcl command. Use it as a lookup reference.
 - **[UG912](https://docs.amd.com/r/en-US/ug912-vivado-properties)** Vivado Design Suite Properties Reference Guide. The properties of every Vivado object (cells, nets, pins, ports, clocks) that you query and set from Tcl and XDC. A lookup reference, like UG835.
 - **[UG909](https://docs.amd.com/r/en-US/ug909-vivado-partial-reconfiguration)** Vivado Design Suite User Guide: Dynamic Function eXchange. Reconfiguring part of the device while the rest keeps running, formerly called partial reconfiguration. An advanced topic; read it when a project needs it.
 
@@ -469,4 +472,4 @@ The overview and DC and AC data sheets are listed under [Versal](#versal) in the
 5. Before your first block design: UG994, UG1037, and the Arm AXI specification. On a Zynq board, add your family's TRM and UG1400.
 6. Everything else as you need it.
 
-I checked every link in this post on 6 October 2026. AMD moves documents from time to time; if a link breaks, search [docs.amd.com](https://docs.amd.com/) for the document number. For more tutorials, see [AICLAB Resources](https://aic-lab.com/resources/).
+I checked every link in this post on October 2026. AMD moves documents from time to time; if a link breaks, search [docs.amd.com](https://docs.amd.com/) for the document number. For more tutorials, see [AICLAB Resources](https://aic-lab.com/resources/).
