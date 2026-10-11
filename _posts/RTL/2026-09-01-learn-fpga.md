@@ -1,6 +1,6 @@
 ---
 number: 23
-title: "Learn FPGA Development"
+title: "Essential Xilinx FPGA Design Documentation for Professional Vivado Development"
 date: 2026-09-01
 categories:
   - RTL
